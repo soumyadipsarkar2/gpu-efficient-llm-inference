@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 330" font-family="Helvetica, Arial, sans-serif" font-size="11">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#52514e"/>
+    </marker>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2a78d6"/>
+    </marker>
+  </defs>
+  <rect width="760" height="330" fill="#ffffff"/>
+
+  <!-- clients -->
+  <rect x="10" y="120" width="92" height="74" rx="8" fill="#f4f3f0" stroke="#bdbcb6"/>
+  <text x="56" y="143" text-anchor="middle" font-weight="bold">Clients</text>
+  <text x="56" y="160" text-anchor="middle" fill="#52514e">load generator</text>
+  <text x="56" y="174" text-anchor="middle" fill="#52514e">closed / Poisson /</text>
+  <text x="56" y="187" text-anchor="middle" fill="#52514e">bursty traces</text>
+  <line x1="102" y1="157" x2="140" y2="157" stroke="#52514e" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="122" y="140" text-anchor="middle" fill="#52514e" font-size="8">HTTP</text><text x="122" y="150" text-anchor="middle" fill="#52514e" font-size="8">SSE</text>
+
+  <!-- router -->
+  <rect x="142" y="60" width="190" height="196" rx="8" fill="#eaf2fc" stroke="#2a78d6"/>
+  <text x="237" y="80" text-anchor="middle" font-weight="bold">Router (FastAPI, asyncio)</text>
+  <text x="237" y="94" text-anchor="middle" fill="#52514e" font-size="9">POST /v1/completions · /stats · /health</text>
+  <rect x="154" y="104" width="166" height="40" rx="5" fill="#ffffff" stroke="#9cc0ec"/>
+  <text x="237" y="120" text-anchor="middle">Routing policy</text>
+  <text x="237" y="135" text-anchor="middle" fill="#52514e" font-size="9">random · RR · least-outst. · GPU-aware</text>
+  <rect x="154" y="150" width="166" height="40" rx="5" fill="#ffffff" stroke="#9cc0ec"/>
+  <text x="237" y="166" text-anchor="middle">Router-local counters</text>
+  <text x="237" y="181" text-anchor="middle" fill="#52514e" font-size="9">in-flight reqs / tokens (always fresh)</text>
+  <rect x="154" y="196" width="166" height="48" rx="5" fill="#ffffff" stroke="#9cc0ec"/>
+  <text x="237" y="212" text-anchor="middle">Telemetry poller (100 ms)</text>
+  <text x="237" y="226" text-anchor="middle" fill="#52514e" font-size="9">KV headroom, step-time fit,</text>
+  <text x="237" y="238" text-anchor="middle" fill="#52514e" font-size="9">health, retry on failure</text>
+
+  <!-- workers -->
+  <g>
+    <rect x="392" y="14" width="356" height="148" rx="8" fill="#f4f3f0" stroke="#bdbcb6"/>
+    <text x="404" y="32" font-weight="bold">Worker 1 (process / GPU)</text>
+    <text x="736" y="32" text-anchor="end" fill="#52514e" font-size="9">/generate · /stats · /metrics</text>
+    <rect x="404" y="42" width="96" height="108" rx="5" fill="#ffffff" stroke="#bdbcb6"/>
+    <text x="452" y="58" text-anchor="middle">HTTP layer</text>
+    <text x="452" y="74" text-anchor="middle" fill="#52514e" font-size="9">async handlers</text>
+    <text x="452" y="87" text-anchor="middle" fill="#52514e" font-size="9">tokenize, SSE</text>
+    <text x="452" y="100" text-anchor="middle" fill="#52514e" font-size="9">stream tokens</text>
+    <text x="452" y="113" text-anchor="middle" fill="#52514e" font-size="9">Prometheus</text>
+    <line x1="500" y1="96" x2="516" y2="96" stroke="#52514e" stroke-width="1.2" marker-end="url(#a)"/>
+    <rect x="518" y="42" width="218" height="108" rx="5" fill="#fff6ef" stroke="#eb6834"/>
+    <text x="627" y="58" text-anchor="middle">Engine thread (GPU loop)</text>
+    <text x="530" y="76" fill="#52514e" font-size="9">waiting queue → scheduler: serial | static</text>
+    <text x="530" y="89" fill="#52514e" font-size="9">window | continuous (iteration-level)</text>
+    <text x="530" y="104" fill="#52514e" font-size="9">admission: batch slots + KV-token budget</text>
+    <text x="530" y="119" fill="#52514e" font-size="9">shared KV cache [B,H,T,D] + 2-D mask</text>
+    <text x="530" y="134" fill="#52514e" font-size="9">model: FP32/BF16/FP16/INT8/INT4 weights,</text>
+    <text x="530" y="146" fill="#52514e" font-size="9">GQA-aware SDPA attention</text>
+  </g>
+  <rect x="392" y="176" width="356" height="62" rx="8" fill="#f4f3f0" stroke="#bdbcb6"/>
+  <text x="404" y="196" font-weight="bold">Worker 2 … N</text>
+  <text x="404" y="214" fill="#52514e">may differ in model, precision, batch limit, KV budget, device</text>
+  <text x="404" y="229" fill="#52514e" font-size="9">(e.g. A-fp16, B-int8, C-fp16 with small memory)</text>
+
+  <line x1="332" y1="120" x2="390" y2="90" stroke="#52514e" stroke-width="1.5" marker-end="url(#a)"/>
+  <line x1="332" y1="140" x2="390" y2="200" stroke="#52514e" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="338" y="88" fill="#52514e" font-size="9">dispatch</text>
+  <path d="M392,150 C360,170 350,205 322,214" fill="none" stroke="#2a78d6" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#b)"/>
+  <text x="338" y="250" fill="#2a78d6" font-size="9">/stats poll</text>
+
+  <!-- simulator -->
+  <rect x="142" y="272" width="606" height="48" rx="8" fill="#effaf5" stroke="#1baf7a"/>
+  <text x="154" y="292" font-weight="bold">Offline: profiler → cost model → discrete-event simulator</text>
+  <text x="154" y="309" fill="#52514e" font-size="10">same policy code as the router; replays traces on simulated clusters of independent GPUs (validated against single-worker runs)</text>
+</svg>

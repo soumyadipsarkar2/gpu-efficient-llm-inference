@@ -1,0 +1,15 @@
+# Example for a 4-GPU CUDA node: one worker per GPU (not run in this study).
+defaults:
+  model: Qwen/Qwen2.5-1.5B-Instruct
+  policy: continuous
+  max_batch: 64
+  kv_budget_tokens: 262144
+router:
+  policy: gpu_aware
+  port: 8000
+  tokenizer: Qwen/Qwen2.5-1.5B-Instruct
+workers:
+  - {port: 8001, device: "cuda:0", precision: fp16}
+  - {port: 8002, device: "cuda:1", precision: fp16}
+  - {port: 8003, device: "cuda:2", precision: int8, extra_args: ["--quant-backend", "bnb"]}
+  - {port: 8004, device: "cuda:3", precision: int4, extra_args: ["--quant-backend", "bnb"]}

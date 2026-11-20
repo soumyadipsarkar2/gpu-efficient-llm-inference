@@ -1,0 +1,12 @@
+name: tests
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install --index-url https://download.pytorch.org/whl/cpu torch==2.5.1
+      - run: pip install transformers==4.46.3 fastapi httpx prometheus-client numpy pyyaml pytest
+      - run: pytest -q

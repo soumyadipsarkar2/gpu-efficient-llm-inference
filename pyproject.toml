@@ -1,0 +1,12 @@
+[project]
+name = "llmserve"
+version = "1.0.0"
+description = "GPU-efficient distributed LLM inference: quantization, dynamic batching and GPU-aware routing"
+requires-python = ">=3.10"
+readme = "README.md"
+
+[tool.setuptools.packages.find]
+include = ["llmserve*", "bench*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

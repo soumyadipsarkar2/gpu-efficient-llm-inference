@@ -1,0 +1,13 @@
+# Heterogeneous pool used in experiment E5: workers differ in precision (speed)
+# and in KV-cache memory headroom.
+defaults:
+  model: Qwen/Qwen2.5-0.5B-Instruct
+  policy: continuous
+router:
+  policy: gpu_aware
+  port: 8000
+  poll_interval: 0.1
+workers:
+  - {port: 8001, name: A-fp16, precision: fp16, max_batch: 32, kv_budget_tokens: 65536}
+  - {port: 8002, name: B-int8, precision: int8, max_batch: 32, kv_budget_tokens: 65536}
+  - {port: 8003, name: C-fp16-small, precision: fp16, max_batch: 8, kv_budget_tokens: 8192}

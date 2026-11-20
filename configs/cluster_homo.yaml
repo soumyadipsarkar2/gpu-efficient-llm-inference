@@ -1,0 +1,16 @@
+# Three identical fp16 workers behind a GPU-aware router.
+#   python -m llmserve.cluster configs/cluster_homo.yaml
+defaults:
+  model: Qwen/Qwen2.5-0.5B-Instruct
+  precision: fp16
+  policy: continuous
+  max_batch: 32
+  kv_budget_tokens: 65536
+router:
+  policy: gpu_aware        # random | round_robin | least_outstanding | gpu_aware
+  port: 8000
+  poll_interval: 0.1
+workers:
+  - {port: 8001, name: A-fp16}
+  - {port: 8002, name: B-fp16}
+  - {port: 8003, name: C-fp16}
