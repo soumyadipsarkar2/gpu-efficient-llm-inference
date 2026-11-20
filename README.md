@@ -31,10 +31,10 @@ reproducible LLM serving stack. It contains:
 
 The experiments so far ran on an Apple M4 GPU. They show that the stock Hugging Face
 grouped-query attention path was the dominant decode cost at realistic batch sizes:
-replacing it with a GQA-aware kernel call makes decode steps **up to 11.2× faster**
+replacing it with a GQA-aware kernel call makes decode steps **up to 10.9× faster**
 with bit-identical outputs. Weight quantization cuts resident model memory by
 **2.0× (INT8)** and **3.6× (INT4)**. Without fused low-bit kernels, however, the
-per-step dequantization makes decode **3–5× slower** than FP16 at small batch sizes.
+per-step dequantization makes decode **2× (INT8) to 4× (INT4) slower** than FP16 at batch 1.
 The gap narrows as batch size grows, because the dequantization cost is paid once
 per step regardless of how many sequences are in the batch.
 
@@ -249,14 +249,14 @@ the GQA-aware path.*
 
 | Context | Batch 1 | Batch 8 | Batch 16 | Batch 32 |
 |---|---|---|---|---|
-| 512 | 34 → 30 ms (1.15×) | 139 → 64 ms (2.2×) | 166 → 43 ms (3.9×) | 284 → 46 ms (**6.2×**) |
-| 1024 | 38 → 31 ms (1.22×) | 187 → 68 ms (2.8×) | 275 → 45 ms (6.1×) | 540 → 59 ms (**9.1×**) |
-| 2048 | 57 → 35 ms (1.66×) | 294 → 73 ms (4.0×) | 525 → 60 ms (8.8×) | 983 → 88 ms (**11.2×**) |
+| 512 | 31 → 30 ms (1.0×) | 128 → 61 ms (2.1×) | 152 → 42 ms (3.6×) | 256 → 44 ms (**5.8×**) |
+| 1024 | 36 → 30 ms (1.2×) | 165 → 60 ms (2.7×) | 249 → 41 ms (6.0×) | 478 → 53 ms (**9.0×**) |
+| 2048 | 54 → 31 ms (1.8×) | 270 → 65 ms (4.1×) | 462 → 50 ms (9.2×) | 902 → 83 ms (**10.9×**) |
 
 * With stock attention, step time grows roughly linearly in batch × context, so
-  batching barely raised throughput: about 59 tok/s at B = 32, T = 1024.
+  batching barely raised throughput: about 67 tok/s at B = 32, T = 1024.
 * With the patch, the step stays near the batch-1 floor of about 30 ms up to B = 32,
-  so the same configuration reaches about 540 tok/s.
+  so the same configuration reaches about 600 tok/s.
 * This single fix changes the conclusion of every batching experiment that follows.
   The lesson: profile the attention path before tuning schedulers.
 
@@ -269,51 +269,54 @@ size at context 512, (c) prefill latency vs. prompt length.*
 
 | Precision | Weights (MiB) | Decode, batch 1 (tok/s) | Decode, batch 32 (tok/s) | Best decode (tok/s) | Prefill, 512 tokens (ms) |
 |---|---|---|---|---|---|
-| FP32 | 1885 | 16.3 | 359 | 371 | 510 |
-| BF16 | 942 | 21.1 | 527 | 736 | 234 |
-| **FP16** | 942 | **33.7** | **699** | **867** | **233** |
-| INT8 (W8) | 472 (−50%) | 8.4 | 214 | 351 | 552 |
-| INT4 (W4, g64) | 265 (−72%) | 6.3 | 160 | 279 | 519 |
-| INT4, FP16 emb/head | 452 (−52%) | 8.2 | 212 | 334 | 450 |
+| FP32 | 1885 | 29.2 | 443 | 470 | 249 |
+| BF16 | 942 | 33.9 | 722 | 972 | 230 |
+| FP16 | 942 | 33.0 | 722 | 972 | 234 |
+| INT8 (W8) | 472 (−50%) | 15.9 | 337 | 519 | 276 |
+| INT4 (W4, g64) | 265 (−72%) | 7.6 | 185 | 307 | 453 |
+| INT4, FP16 emb/head | 452 (−52%) | 8.2 | 238 | 381 | 413 |
+
+All profiles were measured on an otherwise idle GPU. A first pass that overlapped with
+other jobs is kept in `results/profile/first_pass/` for transparency; it had
+under-reported BF16, FP32 and INT8 speed by up to 2×.
 
 Observations:
 
-1. **FP16 is the fastest format on this GPU.** BF16 is 15–37% slower at the same
-   memory, likely because MPS BF16 kernels are less tuned. FP32 doubles memory and
-   halves throughput.
+1. **FP16 and BF16 are equally fast** and are the best formats on this GPU. FP32
+   doubles weight and KV memory and costs 12% (batch 1) to 39% (batch 32) of
+   throughput.
 2. **Quantization buys memory, not speed, without fused kernels.** INT8 halves and INT4
    cuts resident weights by 3.6×. Each decode step, though, pays a fixed cost to
-   dequantize every weight: roughly 90 ms (INT8) and 130 ms (INT4) on top of a
-   30 ms FP16 step. The cost is *independent of batch size*, so the relative penalty
-   shrinks as batches grow (FP16/INT8 throughput ratio: 4.0× at B = 1, 2.5× at
-   B = 64).
-3. **The LM head dominates INT4 overhead.** Keeping the 136M-parameter tied
-   embedding/LM head in FP16 removes about 40% of the INT4 per-step overhead
-   (fixed cost 0.21 s → 0.12 s) at the price of 187 MiB more memory. Low-bit kernels
-   matter most for the largest matrix.
+   dequantize every weight: about 33 ms (INT8) and 100 ms (INT4) on top of a 30 ms
+   FP16 step. The cost is *independent of batch size*, so the relative penalty shrinks
+   as batches grow:
+
+   | Throughput ratio | Batch 1 | Batch 64 |
+   |---|---|---|
+   | FP16 / INT8 | 2.1× | 1.9× |
+   | FP16 / INT4 | 4.3× | 3.2× |
+
+3. **The LM head is a large part of the INT4 overhead.** Keeping the 136M-parameter
+   tied embedding/LM head in FP16 makes INT4 decode 8% faster at batch 1 and 29%
+   faster at batch 32, for 187 MiB more memory. Low-bit kernels matter most for the
+   largest matrix.
 4. **Kernel-shape cliffs.** Batch 8 is consistently *slower* than batch 16, for both
-   models and every precision (0.5B FP16: 64 ms vs. 43 ms; 1.5B FP16: 214 ms vs.
+   models and most precisions (0.5B FP16: 61 ms vs. 42 ms; 1.5B FP16: 214 ms vs.
    103 ms). MPS appears to choose a poor GEMM kernel at that shape. A scheduler that
    rounds batches up to an efficient size would benefit; the simulator inherits the
    effect because it interpolates the measured grid.
 5. **Memory cliff.** Throughput collapses once a single process's KV working set
-   exceeds roughly 1 GB on this 16 GB unified-memory machine. FP32 at B = 64,
-   T = 1024 takes 6.6 s per step, against 0.11 s at B = 32. This motivates the
-   per-worker KV budget used for admission control.
+   exceeds roughly 1–1.5 GB on this 16 GB unified-memory machine. FP32 at B = 64,
+   T = 1024 (1.6 GB of KV) takes 3.5 s per step, against 0.10 s at B = 32. This
+   motivates the per-worker KV budget used for admission control.
 
 **Qwen2.5-1.5B FP16** (2,944 MiB of weights, 28 KiB of KV per token): prefill takes
 1.05 s for 512 tokens and 5.2 s for 2048 tokens. Decode at context 512 takes 44 ms per
-step at batch 1 (23 tok/s) and 142 ms at batch 32 (225 tok/s). The 1.5B INT8/INT4
-profiles were interrupted and will be added.
+step at batch 1 (23 tok/s) and 142 ms at batch 32 (225 tok/s).
 
 ![precision 1.5B](report/figures/e1_precision_qwen1.5b.png)
 
-*Figure 3. Qwen2.5-1.5B FP16 profile.*
-
-> **Measurement note.** The first-pass 0.5B FP32, BF16 and INT8 profiles ran while
-> other jobs briefly used the machine. All 0.5B profiles will be re-measured on an idle
-> GPU (`scripts/reprofile_clean.sh`) and this table updated. The qualitative
-> conclusions above do not depend on those runs.
+*Figure 3. Qwen2.5-1.5B profile.*
 
 ### E2–E7. Remaining experiments
 
@@ -331,7 +334,7 @@ These are implemented and scripted; their results will be added as each complete
 ## 6. Discussion (so far)
 
 * **Find the bottleneck before optimizing policy.** The largest single gain in the
-  project so far (up to 11×) came from removing a memory copy in attention, not from
+  project so far (up to 10.9×) came from removing a memory copy in attention, not from
   scheduling. With it in place, decode cost is nearly flat up to batch 32, which is
   what makes batching and batch-aware routing worthwhile at all.
 * **Quantization is a memory lever.** On hardware without fused low-bit GEMMs it should
@@ -393,7 +396,7 @@ python -m analysis.figures                # all figures + report/tables.json
 | Experiment | Status |
 |---|---|
 | E0 GQA kernel ablation | ✅ done |
-| E1 precision profiles, 0.5B (6 formats) | ✅ done (clean re-measure queued) |
+| E1 precision profiles, 0.5B (6 formats) | ✅ done (clean re-measure) |
 | E1 precision profiles, 1.5B | FP16 ✅ · INT8/INT4 pending |
 | E2 quality | ⏳ pending |
 | E3 batching | ⏳ pending |

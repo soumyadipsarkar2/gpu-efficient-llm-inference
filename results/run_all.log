@@ -1,167 +1,251 @@
-{"model_id": "Qwen/Qwen2.5-0.5B-Instruct", "precision": "int4", "device": "mps", "device_name": "Apple silicon GPU (MPS)", "load_seconds": 2.12, "weight_bytes_measured": 800044544, "weight_bytes_tensors": 277999488, "n_params_or_codes": 247024512, "quant": {"backend": "native", "bits": 4, "group_size": 64, "n_linear": 169, "params_quantized": 493961216, "params_total": 494032768, "bytes_before": 988068736, "bytes_after": 277999488}, "fast_gqa": true, "kv_bytes_per_token": 12288}
-prefill L=32: 118.0 ms
-prefill L=128: 171.7 ms
-prefill L=256: 780.3 ms
-prefill L=512: 519.3 ms
-prefill L=1024: 1439.9 ms
-prefill L=2048: 3376.1 ms
-decode B=1 T=128: 341.1 ms  (3 tok/s)
-decode B=2 T=128: 378.0 ms  (5 tok/s)
-decode B=4 T=128: 393.1 ms  (10 tok/s)
-decode B=8 T=128: 396.2 ms  (20 tok/s)
-decode B=16 T=128: 385.4 ms  (42 tok/s)
-decode B=32 T=128: 194.4 ms  (165 tok/s)
-decode B=64 T=128: 236.5 ms  (271 tok/s)
-decode B=1 T=512: 157.6 ms  (6 tok/s)
-decode B=2 T=512: 169.1 ms  (12 tok/s)
-decode B=4 T=512: 172.8 ms  (23 tok/s)
-decode B=8 T=512: 208.3 ms  (38 tok/s)
-decode B=16 T=512: 175.3 ms  (91 tok/s)
-decode B=32 T=512: 200.4 ms  (160 tok/s)
-decode B=64 T=512: 229.1 ms  (279 tok/s)
-decode B=1 T=1024: 143.0 ms  (7 tok/s)
-decode B=2 T=1024: 147.6 ms  (14 tok/s)
-decode B=4 T=1024: 170.4 ms  (23 tok/s)
-decode B=8 T=1024: 192.1 ms  (42 tok/s)
-decode B=16 T=1024: 173.7 ms  (92 tok/s)
-decode B=32 T=1024: 196.4 ms  (163 tok/s)
-decode B=64 T=1024: 331.8 ms  (193 tok/s)
-decode B=1 T=2048: 139.4 ms  (7 tok/s)
-decode B=2 T=2048: 147.4 ms  (14 tok/s)
-decode B=4 T=2048: 157.2 ms  (25 tok/s)
-decode B=8 T=2048: 185.2 ms  (43 tok/s)
-decode B=16 T=2048: 171.7 ms  (93 tok/s)
-decode B=32 T=2048: 218.7 ms  (146 tok/s)
-fit: {'a': 0.21401577889625653, 'c': 0.0009651765008144186, 'e': -5.726481318121204e-07, 'r2': 0.029807449867411684, 'p0': 0.015521044528025607, 'p1': 0.0015780400687138442}
-{"model_id": "Qwen/Qwen2.5-0.5B-Instruct", "precision": "int4", "device": "mps", "device_name": "Apple silicon GPU (MPS)", "load_seconds": 2.12, "weight_bytes_measured": 991483904, "weight_bytes_tensors": 473693056, "n_params_or_codes": 315091840, "quant": {"backend": "native", "bits": 4, "group_size": 64, "n_linear": 168, "params_quantized": 357826560, "params_total": 494032768, "bytes_before": 988068736, "bytes_after": 473693056}, "fast_gqa": true, "kv_bytes_per_token": 12288}
-prefill L=32: 92.9 ms
-prefill L=128: 177.9 ms
-prefill L=256: 389.7 ms
-prefill L=512: 450.1 ms
-prefill L=1024: 949.8 ms
-prefill L=2048: 2374.3 ms
-decode B=1 T=128: 101.3 ms  (10 tok/s)
-decode B=2 T=128: 146.5 ms  (14 tok/s)
-decode B=4 T=128: 138.3 ms  (29 tok/s)
-decode B=8 T=128: 166.1 ms  (48 tok/s)
-decode B=16 T=128: 143.6 ms  (111 tok/s)
-decode B=32 T=128: 144.4 ms  (222 tok/s)
-decode B=64 T=128: 179.2 ms  (357 tok/s)
-decode B=1 T=512: 121.7 ms  (8 tok/s)
-decode B=2 T=512: 125.9 ms  (16 tok/s)
-decode B=4 T=512: 132.1 ms  (30 tok/s)
-decode B=8 T=512: 164.5 ms  (49 tok/s)
-decode B=16 T=512: 142.6 ms  (112 tok/s)
-decode B=32 T=512: 150.8 ms  (212 tok/s)
-decode B=64 T=512: 191.6 ms  (334 tok/s)
-decode B=1 T=1024: 102.9 ms  (10 tok/s)
-decode B=2 T=1024: 118.9 ms  (17 tok/s)
-decode B=4 T=1024: 128.3 ms  (31 tok/s)
-decode B=8 T=1024: 153.5 ms  (52 tok/s)
-decode B=16 T=1024: 136.5 ms  (117 tok/s)
-decode B=32 T=1024: 157.8 ms  (203 tok/s)
-decode B=64 T=1024: 218.1 ms  (294 tok/s)
-decode B=1 T=2048: 103.5 ms  (10 tok/s)
-decode B=2 T=2048: 110.6 ms  (18 tok/s)
-decode B=4 T=2048: 126.4 ms  (32 tok/s)
-decode B=8 T=2048: 158.5 ms  (50 tok/s)
-decode B=16 T=2048: 135.8 ms  (118 tok/s)
-decode B=32 T=2048: 179.9 ms  (178 tok/s)
-fit: {'a': 0.12400915310597632, 'c': 0.0008686450818341034, 'e': 4.2652157186497233e-07, 'r2': 0.6955994719977094, 'p0': 0.0009412206019403578, 'p1': 0.0011072344501315422}
-{"model_id": "Qwen/Qwen2.5-0.5B-Instruct", "precision": "fp16", "device": "mps", "device_name": "Apple silicon GPU (MPS)", "load_seconds": 1.97, "weight_bytes_measured": 988071936, "weight_bytes_tensors": 988068736, "n_params_or_codes": 494032768, "quant": {}, "fast_gqa": false, "kv_bytes_per_token": 12288}
-prefill L=32: 38.0 ms
-prefill L=128: 66.3 ms
-prefill L=256: 146.6 ms
-prefill L=512: 414.4 ms
-prefill L=1024: 826.5 ms
-prefill L=2048: 2259.1 ms
-decode B=1 T=128: 29.3 ms  (34 tok/s)
-decode B=2 T=128: 33.2 ms  (60 tok/s)
-decode B=4 T=128: 44.1 ms  (91 tok/s)
-decode B=8 T=128: 81.1 ms  (99 tok/s)
-decode B=16 T=128: 127.6 ms  (125 tok/s)
-decode B=32 T=128: 115.8 ms  (276 tok/s)
-decode B=64 T=128: 195.8 ms  (327 tok/s)
+{"model_id": "Qwen/Qwen2.5-0.5B-Instruct", "precision": "fp16", "device": "mps", "device_name": "Apple silicon GPU (MPS)", "load_seconds": 2.46, "weight_bytes_measured": 988071936, "weight_bytes_tensors": 988068736, "n_params_or_codes": 494032768, "quant": {}, "fast_gqa": true, "kv_bytes_per_token": 12288}
+prefill L=32: 31.9 ms
+prefill L=128: 58.2 ms
+prefill L=256: 111.5 ms
+prefill L=512: 233.9 ms
+prefill L=1024: 585.1 ms
+prefill L=2048: 1567.9 ms
+decode B=1 T=128: 30.7 ms  (33 tok/s)
+decode B=2 T=128: 30.8 ms  (65 tok/s)
+decode B=4 T=128: 37.4 ms  (107 tok/s)
+decode B=8 T=128: 63.6 ms  (126 tok/s)
+decode B=16 T=128: 40.8 ms  (392 tok/s)
+decode B=32 T=128: 43.8 ms  (730 tok/s)
+decode B=64 T=128: 57.6 ms  (1112 tok/s)
+decode B=1 T=512: 30.3 ms  (33 tok/s)
+decode B=2 T=512: 30.9 ms  (65 tok/s)
+decode B=4 T=512: 37.4 ms  (107 tok/s)
+decode B=8 T=512: 61.1 ms  (131 tok/s)
+decode B=16 T=512: 41.8 ms  (383 tok/s)
+decode B=32 T=512: 44.3 ms  (722 tok/s)
+decode B=64 T=512: 65.9 ms  (972 tok/s)
+decode B=1 T=1024: 29.7 ms  (34 tok/s)
+decode B=2 T=1024: 30.7 ms  (65 tok/s)
+decode B=4 T=1024: 38.4 ms  (104 tok/s)
+decode B=8 T=1024: 60.4 ms  (132 tok/s)
+decode B=16 T=1024: 41.2 ms  (388 tok/s)
+decode B=32 T=1024: 53.3 ms  (600 tok/s)
+decode B=64 T=1024: 132.8 ms  (482 tok/s)
+decode B=1 T=2048: 30.9 ms  (32 tok/s)
+decode B=2 T=2048: 31.6 ms  (63 tok/s)
+decode B=4 T=2048: 40.4 ms  (99 tok/s)
+decode B=8 T=2048: 65.4 ms  (122 tok/s)
+decode B=16 T=2048: 50.2 ms  (319 tok/s)
+decode B=32 T=2048: 82.7 ms  (387 tok/s)
+fit: {'a': 0.03377493123040809, 'c': 0.0002934097005945384, 'e': 7.692734704515672e-07, 'r2': 0.7018604249125606, 'p0': -0.08005096759070662, 'p1': 0.0007672317638860498}
+{"model_id": "Qwen/Qwen2.5-0.5B-Instruct", "precision": "bf16", "device": "mps", "device_name": "Apple silicon GPU (MPS)", "load_seconds": 1.58, "weight_bytes_measured": 988071936, "weight_bytes_tensors": 988068736, "n_params_or_codes": 494032768, "quant": {}, "fast_gqa": true, "kv_bytes_per_token": 12288}
+prefill L=32: 32.9 ms
+prefill L=128: 55.7 ms
+prefill L=256: 104.7 ms
+prefill L=512: 230.2 ms
+prefill L=1024: 547.2 ms
+prefill L=2048: 1481.5 ms
+decode B=1 T=128: 28.8 ms  (35 tok/s)
+decode B=2 T=128: 29.4 ms  (68 tok/s)
+decode B=4 T=128: 35.2 ms  (114 tok/s)
+decode B=8 T=128: 56.3 ms  (142 tok/s)
+decode B=16 T=128: 40.0 ms  (400 tok/s)
+decode B=32 T=128: 43.7 ms  (733 tok/s)
+decode B=64 T=128: 53.8 ms  (1190 tok/s)
+decode B=1 T=512: 29.5 ms  (34 tok/s)
+decode B=2 T=512: 30.8 ms  (65 tok/s)
+decode B=4 T=512: 36.3 ms  (110 tok/s)
+decode B=8 T=512: 59.7 ms  (134 tok/s)
+decode B=16 T=512: 41.1 ms  (389 tok/s)
+decode B=32 T=512: 44.3 ms  (722 tok/s)
+decode B=64 T=512: 65.8 ms  (972 tok/s)
+decode B=1 T=1024: 29.9 ms  (33 tok/s)
+decode B=2 T=1024: 30.9 ms  (65 tok/s)
+decode B=4 T=1024: 39.2 ms  (102 tok/s)
+decode B=8 T=1024: 61.7 ms  (130 tok/s)
+decode B=16 T=1024: 52.8 ms  (303 tok/s)
+decode B=32 T=1024: 52.9 ms  (605 tok/s)
+decode B=64 T=1024: 87.3 ms  (733 tok/s)
+decode B=1 T=2048: 30.6 ms  (33 tok/s)
+decode B=2 T=2048: 31.6 ms  (63 tok/s)
+decode B=4 T=2048: 40.3 ms  (99 tok/s)
+decode B=8 T=2048: 65.9 ms  (121 tok/s)
+decode B=16 T=2048: 50.4 ms  (317 tok/s)
+decode B=32 T=2048: 80.0 ms  (400 tok/s)
+fit: {'a': 0.03576992420909117, 'c': 0.00019519330231745552, 'e': 5.75220627837413e-07, 'r2': 0.6951139453774711, 'p0': -0.07337669419868384, 'p1': 0.0007231419582980265}
+{"model_id": "Qwen/Qwen2.5-0.5B-Instruct", "precision": "fp32", "device": "mps", "device_name": "Apple silicon GPU (MPS)", "load_seconds": 1.76, "weight_bytes_measured": 1976137472, "weight_bytes_tensors": 1976134272, "n_params_or_codes": 494032768, "quant": {}, "fast_gqa": true, "kv_bytes_per_token": 24576}
+prefill L=32: 34.0 ms
+prefill L=128: 66.1 ms
+prefill L=256: 131.6 ms
+prefill L=512: 249.1 ms
+prefill L=1024: 580.0 ms
+prefill L=2048: 1883.5 ms
+decode B=1 T=128: 44.5 ms  (22 tok/s)
+decode B=2 T=128: 35.2 ms  (57 tok/s)
+decode B=4 T=128: 32.7 ms  (122 tok/s)
+decode B=8 T=128: 43.9 ms  (182 tok/s)
+decode B=16 T=128: 46.3 ms  (346 tok/s)
+decode B=32 T=128: 55.6 ms  (576 tok/s)
+decode B=64 T=128: 73.3 ms  (873 tok/s)
 decode B=1 T=512: 34.2 ms  (29 tok/s)
-decode B=2 T=512: 43.8 ms  (46 tok/s)
-decode B=4 T=512: 78.7 ms  (51 tok/s)
-decode B=8 T=512: 138.8 ms  (58 tok/s)
-decode B=16 T=512: 166.2 ms  (96 tok/s)
-decode B=32 T=512: 283.7 ms  (113 tok/s)
-decode B=64 T=512: 539.8 ms  (119 tok/s)
-decode B=1 T=1024: 38.0 ms  (26 tok/s)
-decode B=2 T=1024: 67.9 ms  (29 tok/s)
-decode B=4 T=1024: 112.8 ms  (35 tok/s)
-decode B=8 T=1024: 187.2 ms  (43 tok/s)
-decode B=16 T=1024: 274.9 ms  (58 tok/s)
-decode B=32 T=1024: 539.6 ms  (59 tok/s)
-decode B=64 T=1024: 1016.2 ms  (63 tok/s)
-decode B=1 T=2048: 57.4 ms  (17 tok/s)
-decode B=2 T=2048: 95.5 ms  (21 tok/s)
-decode B=4 T=2048: 155.0 ms  (26 tok/s)
-decode B=8 T=2048: 294.0 ms  (27 tok/s)
-decode B=16 T=2048: 525.1 ms  (30 tok/s)
-decode B=32 T=2048: 983.3 ms  (33 tok/s)
-fit: {'a': 0.042224602640527936, 'c': 0.0006600690005830554, 'e': 1.4178617677415479e-05, 'r2': 0.9963939026344278, 'p0': -0.11237946540892108, 'p1': 0.0011062871876079399}
-{"model_id": "Qwen/Qwen2.5-1.5B-Instruct", "precision": "fp16", "device": "mps", "device_name": "Apple silicon GPU (MPS)", "load_seconds": 3.99, "weight_bytes_measured": 3087436032, "weight_bytes_tensors": 3087436032, "n_params_or_codes": 1543714304, "quant": {}, "fast_gqa": true, "kv_bytes_per_token": 28672}
-prefill L=32: 59.5 ms
-prefill L=128: 263.6 ms
-prefill L=256: 543.2 ms
-prefill L=512: 1047.2 ms
-prefill L=1024: 2233.7 ms
-prefill L=2048: 5194.9 ms
-decode B=1 T=128: 40.2 ms  (25 tok/s)
-decode B=2 T=128: 66.2 ms  (30 tok/s)
-decode B=4 T=128: 117.4 ms  (34 tok/s)
-decode B=8 T=128: 219.8 ms  (36 tok/s)
-decode B=16 T=128: 119.9 ms  (133 tok/s)
-decode B=32 T=128: 119.3 ms  (268 tok/s)
-decode B=1 T=512: 44.2 ms  (23 tok/s)
-decode B=2 T=512: 67.1 ms  (30 tok/s)
-decode B=4 T=512: 117.0 ms  (34 tok/s)
-decode B=8 T=512: 213.5 ms  (37 tok/s)
-decode B=16 T=512: 102.5 ms  (156 tok/s)
-decode B=32 T=512: 142.2 ms  (225 tok/s)
-decode B=1 T=1024: 41.7 ms  (24 tok/s)
-decode B=2 T=1024: 68.0 ms  (29 tok/s)
-decode B=4 T=1024: 117.4 ms  (34 tok/s)
-decode B=8 T=1024: 219.5 ms  (36 tok/s)
-decode B=16 T=1024: 113.5 ms  (141 tok/s)
-decode B=32 T=1024: 227.6 ms  (141 tok/s)
-decode B=1 T=2048: 44.5 ms  (22 tok/s)
-decode B=2 T=2048: 72.8 ms  (27 tok/s)
-decode B=4 T=2048: 124.1 ms  (32 tok/s)
-decode B=8 T=2048: 251.4 ms  (32 tok/s)
-decode B=16 T=2048: 152.0 ms  (105 tok/s)
-decode B=32 T=2048: 11046.7 ms  (3 tok/s)
-fit: {'a': -0.3237344234277496, 'c': -0.042775738050645114, 'e': 0.0001385358360898891, 'r2': 0.6561422176232672, 'p0': -0.13384655507772206, 'p1': 0.002536314968133023}
-{"model_id": "Qwen/Qwen2.5-1.5B-Instruct", "precision": "int8", "device": "mps", "device_name": "Apple silicon GPU (MPS)", "load_seconds": 5.52, "weight_bytes_measured": 1984912384, "weight_bytes_tensors": 1545460736, "n_params_or_codes": 1543656960, "quant": {"backend": "native", "bits": 8, "group_size": 64, "n_linear": 197, "params_quantized": 1543569408, "params_total": 1543714304, "bytes_before": 3087436032, "bytes_after": 1545460736}, "fast_gqa": true, "kv_bytes_per_token": 28672}
-prefill L=32: 172.1 ms
-prefill L=128: 280.9 ms
-prefill L=256: 547.6 ms
-prefill L=512: 1337.0 ms
-prefill L=1024: 2820.6 ms
-prefill L=2048: 6382.9 ms
-decode B=1 T=128: 185.3 ms  (5 tok/s)
-decode B=2 T=128: 254.7 ms  (8 tok/s)
-decode B=4 T=128: 360.7 ms  (11 tok/s)
-decode B=8 T=128: 518.9 ms  (15 tok/s)
-decode B=16 T=128: 299.3 ms  (53 tok/s)
-decode B=32 T=128: 332.6 ms  (96 tok/s)
-decode B=1 T=512: 179.7 ms  (6 tok/s)
-decode B=2 T=512: 206.8 ms  (10 tok/s)
-decode B=4 T=512: 263.2 ms  (15 tok/s)
-decode B=8 T=512: 541.0 ms  (15 tok/s)
-decode B=16 T=512: 254.7 ms  (63 tok/s)
-decode B=32 T=512: 295.0 ms  (108 tok/s)
-decode B=1 T=1024: 170.2 ms  (6 tok/s)
-decode B=2 T=1024: 202.9 ms  (10 tok/s)
-decode B=4 T=1024: 251.4 ms  (16 tok/s)
-decode B=8 T=1024: 393.4 ms  (20 tok/s)
-decode B=16 T=1024: 261.6 ms  (61 tok/s)
-decode B=32 T=1024: 294.4 ms  (109 tok/s)
-decode B=1 T=2048: 171.5 ms  (6 tok/s)
-decode B=2 T=2048: 202.4 ms  (10 tok/s)
-decode B=4 T=2048: 262.8 ms  (15 tok/s)
-decode B=8 T=2048: 399.1 ms  (20 tok/s)
-decode B=16 T=2048: 359.1 ms  (45 tok/s)
+decode B=2 T=512: 40.4 ms  (49 tok/s)
+decode B=4 T=512: 38.2 ms  (105 tok/s)
+decode B=8 T=512: 51.1 ms  (157 tok/s)
+decode B=16 T=512: 56.8 ms  (281 tok/s)
+decode B=32 T=512: 72.2 ms  (443 tok/s)
+decode B=64 T=512: 136.3 ms  (470 tok/s)
+decode B=1 T=1024: 36.9 ms  (27 tok/s)
+decode B=2 T=1024: 34.7 ms  (58 tok/s)
+decode B=4 T=1024: 39.4 ms  (102 tok/s)
+decode B=8 T=1024: 55.9 ms  (143 tok/s)
+decode B=16 T=1024: 68.7 ms  (233 tok/s)
+decode B=32 T=1024: 102.4 ms  (312 tok/s)
+decode B=64 T=1024: 3474.9 ms  (18 tok/s)
+decode B=1 T=2048: 39.6 ms  (25 tok/s)
+decode B=2 T=2048: 34.8 ms  (57 tok/s)
+decode B=4 T=2048: 38.9 ms  (103 tok/s)
+decode B=8 T=2048: 64.2 ms  (125 tok/s)
+decode B=16 T=2048: 79.2 ms  (202 tok/s)
+decode B=32 T=2048: 116.5 ms  (275 tok/s)
+fit: {'a': -0.13572616024358772, 'c': 0.005914457409929861, 'e': 1.758624468511566e-05, 'r2': 0.38671435794789155, 'p0': -0.11614077007911489, 'p1': 0.0009102854883686743}
+{"model_id": "Qwen/Qwen2.5-0.5B-Instruct", "precision": "int8", "device": "mps", "device_name": "Apple silicon GPU (MPS)", "load_seconds": 2.01, "weight_bytes_measured": 1486702080, "weight_bytes_tensors": 495019648, "n_params_or_codes": 494005120, "quant": {"backend": "native", "bits": 8, "group_size": 64, "n_linear": 169, "params_quantized": 493961216, "params_total": 494032768, "bytes_before": 988068736, "bytes_after": 495019648}, "fast_gqa": true, "kv_bytes_per_token": 12288}
+prefill L=32: 59.4 ms
+prefill L=128: 93.3 ms
+prefill L=256: 141.9 ms
+prefill L=512: 275.9 ms
+prefill L=1024: 601.8 ms
+prefill L=2048: 1845.7 ms
+decode B=1 T=128: 56.4 ms  (18 tok/s)
+decode B=2 T=128: 63.1 ms  (32 tok/s)
+decode B=4 T=128: 76.4 ms  (52 tok/s)
+decode B=8 T=128: 105.6 ms  (76 tok/s)
+decode B=16 T=128: 87.0 ms  (184 tok/s)
+decode B=32 T=128: 88.3 ms  (362 tok/s)
+decode B=64 T=128: 106.0 ms  (604 tok/s)
+decode B=1 T=512: 62.8 ms  (16 tok/s)
+decode B=2 T=512: 67.7 ms  (30 tok/s)
+decode B=4 T=512: 81.0 ms  (49 tok/s)
+decode B=8 T=512: 108.1 ms  (74 tok/s)
+decode B=16 T=512: 87.8 ms  (182 tok/s)
+decode B=32 T=512: 95.0 ms  (337 tok/s)
+decode B=64 T=512: 123.4 ms  (519 tok/s)
+decode B=1 T=1024: 60.3 ms  (17 tok/s)
+decode B=2 T=1024: 69.4 ms  (29 tok/s)
+decode B=4 T=1024: 82.0 ms  (49 tok/s)
+decode B=8 T=1024: 106.6 ms  (75 tok/s)
+decode B=16 T=1024: 91.9 ms  (174 tok/s)
+decode B=32 T=1024: 105.5 ms  (303 tok/s)
+decode B=64 T=1024: 161.6 ms  (396 tok/s)
+decode B=1 T=2048: 64.0 ms  (16 tok/s)
+decode B=2 T=2048: 67.3 ms  (30 tok/s)
+decode B=4 T=2048: 80.9 ms  (49 tok/s)
+decode B=8 T=2048: 105.7 ms  (76 tok/s)
+decode B=16 T=2048: 96.4 ms  (166 tok/s)
+decode B=32 T=2048: 134.2 ms  (239 tok/s)
+fit: {'a': 0.07265453112677119, 'c': 0.0004793316002504639, 'e': 7.630964047979132e-07, 'r2': 0.7599467948647943, 'p0': -0.08476589633844604, 'p1': 0.0008816510632576883}
+{"model_id": "Qwen/Qwen2.5-0.5B-Instruct", "precision": "int4", "device": "mps", "device_name": "Apple silicon GPU (MPS)", "load_seconds": 2.45, "weight_bytes_measured": 800044544, "weight_bytes_tensors": 277999488, "n_params_or_codes": 247024512, "quant": {"backend": "native", "bits": 4, "group_size": 64, "n_linear": 169, "params_quantized": 493961216, "params_total": 494032768, "bytes_before": 988068736, "bytes_after": 277999488}, "fast_gqa": true, "kv_bytes_per_token": 12288}
+prefill L=32: 120.0 ms
+prefill L=128: 197.3 ms
+prefill L=256: 388.4 ms
+prefill L=512: 453.2 ms
+prefill L=1024: 905.0 ms
+prefill L=2048: 2224.3 ms
+decode B=1 T=128: 127.0 ms  (8 tok/s)
+decode B=2 T=128: 182.9 ms  (11 tok/s)
+decode B=4 T=128: 160.1 ms  (25 tok/s)
+decode B=8 T=128: 193.7 ms  (41 tok/s)
+decode B=16 T=128: 166.1 ms  (96 tok/s)
+decode B=32 T=128: 174.6 ms  (183 tok/s)
+decode B=64 T=128: 201.4 ms  (318 tok/s)
+decode B=1 T=512: 131.7 ms  (8 tok/s)
+decode B=2 T=512: 150.5 ms  (13 tok/s)
+decode B=4 T=512: 157.0 ms  (25 tok/s)
+decode B=8 T=512: 195.2 ms  (41 tok/s)
+decode B=16 T=512: 205.7 ms  (78 tok/s)
+decode B=32 T=512: 172.8 ms  (185 tok/s)
+decode B=64 T=512: 208.3 ms  (307 tok/s)
+decode B=1 T=1024: 132.8 ms  (8 tok/s)
+decode B=2 T=1024: 141.9 ms  (14 tok/s)
+decode B=4 T=1024: 157.1 ms  (25 tok/s)
+decode B=8 T=1024: 186.0 ms  (43 tok/s)
+decode B=16 T=1024: 162.9 ms  (98 tok/s)
+decode B=32 T=1024: 179.4 ms  (178 tok/s)
+decode B=64 T=1024: 233.1 ms  (275 tok/s)
+decode B=1 T=2048: 131.1 ms  (8 tok/s)
+decode B=2 T=2048: 136.2 ms  (15 tok/s)
+decode B=4 T=2048: 149.6 ms  (27 tok/s)
+decode B=8 T=2048: 174.5 ms  (46 tok/s)
+decode B=16 T=2048: 163.7 ms  (98 tok/s)
+decode B=32 T=2048: 194.5 ms  (165 tok/s)
+fit: {'a': 0.1520450862056337, 'c': 0.0008496079311100443, 'e': 2.566375562214391e-07, 'r2': 0.5553249134691054, 'p0': 0.033765919452180666, 'p1': 0.0010214183918217093}
+{"model_id": "Qwen/Qwen2.5-0.5B-Instruct", "precision": "int4", "device": "mps", "device_name": "Apple silicon GPU (MPS)", "load_seconds": 1.98, "weight_bytes_measured": 991483904, "weight_bytes_tensors": 473693056, "n_params_or_codes": 315091840, "quant": {"backend": "native", "bits": 4, "group_size": 64, "n_linear": 168, "params_quantized": 357826560, "params_total": 494032768, "bytes_before": 988068736, "bytes_after": 473693056}, "fast_gqa": true, "kv_bytes_per_token": 12288}
+prefill L=32: 106.5 ms
+prefill L=128: 156.1 ms
+prefill L=256: 345.5 ms
+prefill L=512: 413.4 ms
+prefill L=1024: 820.6 ms
+prefill L=2048: 2050.5 ms
+decode B=1 T=128: 91.1 ms  (11 tok/s)
+decode B=2 T=128: 105.2 ms  (19 tok/s)
+decode B=4 T=128: 166.1 ms  (24 tok/s)
+decode B=8 T=128: 265.2 ms  (30 tok/s)
+decode B=16 T=128: 186.9 ms  (86 tok/s)
+decode B=32 T=128: 185.3 ms  (173 tok/s)
+decode B=64 T=128: 206.3 ms  (310 tok/s)
+decode B=1 T=512: 122.3 ms  (8 tok/s)
+decode B=2 T=512: 119.1 ms  (17 tok/s)
+decode B=4 T=512: 122.3 ms  (33 tok/s)
+decode B=8 T=512: 145.8 ms  (55 tok/s)
+decode B=16 T=512: 135.6 ms  (118 tok/s)
+decode B=32 T=512: 134.3 ms  (238 tok/s)
+decode B=64 T=512: 168.2 ms  (381 tok/s)
+decode B=1 T=1024: 117.0 ms  (9 tok/s)
+decode B=2 T=1024: 110.6 ms  (18 tok/s)
+decode B=4 T=1024: 124.6 ms  (32 tok/s)
+decode B=8 T=1024: 172.4 ms  (46 tok/s)
+decode B=16 T=1024: 141.2 ms  (113 tok/s)
+decode B=32 T=1024: 140.3 ms  (228 tok/s)
+decode B=64 T=1024: 213.2 ms  (300 tok/s)
+decode B=1 T=2048: 94.9 ms  (11 tok/s)
+decode B=2 T=2048: 104.7 ms  (19 tok/s)
+decode B=4 T=2048: 116.2 ms  (34 tok/s)
+decode B=8 T=2048: 139.1 ms  (58 tok/s)
+decode B=16 T=2048: 124.8 ms  (128 tok/s)
+decode B=32 T=2048: 162.4 ms  (197 tok/s)
+fit: {'a': 0.1273868283502913, 'c': 0.001323633778513506, 'e': -3.284629254944121e-07, 'r2': 0.32418761058336054, 'p0': 0.017075556152629928, 'p1': 0.0009475551975211025}
+{"model_id": "Qwen/Qwen2.5-0.5B-Instruct", "precision": "fp16", "device": "mps", "device_name": "Apple silicon GPU (MPS)", "load_seconds": 1.8, "weight_bytes_measured": 988071936, "weight_bytes_tensors": 988068736, "n_params_or_codes": 494032768, "quant": {}, "fast_gqa": false, "kv_bytes_per_token": 12288}
+prefill L=32: 32.1 ms
+prefill L=128: 66.4 ms
+prefill L=256: 138.5 ms
+prefill L=512: 355.2 ms
+prefill L=1024: 742.9 ms
+prefill L=2048: 1952.7 ms
+decode B=1 T=128: 29.4 ms  (34 tok/s)
+decode B=2 T=128: 32.5 ms  (62 tok/s)
+decode B=4 T=128: 41.6 ms  (96 tok/s)
+decode B=8 T=128: 70.8 ms  (113 tok/s)
+decode B=16 T=128: 81.9 ms  (195 tok/s)
+decode B=32 T=128: 118.4 ms  (270 tok/s)
+decode B=64 T=128: 177.6 ms  (360 tok/s)
+decode B=1 T=512: 31.1 ms  (32 tok/s)
+decode B=2 T=512: 38.8 ms  (52 tok/s)
+decode B=4 T=512: 65.7 ms  (61 tok/s)
+decode B=8 T=512: 128.1 ms  (62 tok/s)
+decode B=16 T=512: 152.0 ms  (105 tok/s)
+decode B=32 T=512: 255.6 ms  (125 tok/s)
+decode B=64 T=512: 481.9 ms  (133 tok/s)
+decode B=1 T=1024: 36.0 ms  (28 tok/s)
+decode B=2 T=1024: 57.6 ms  (35 tok/s)
+decode B=4 T=1024: 100.2 ms  (40 tok/s)
+decode B=8 T=1024: 164.8 ms  (49 tok/s)
+decode B=16 T=1024: 249.0 ms  (64 tok/s)
+decode B=32 T=1024: 477.8 ms  (67 tok/s)
+decode B=64 T=1024: 885.8 ms  (72 tok/s)
+decode B=1 T=2048: 54.1 ms  (18 tok/s)
+decode B=2 T=2048: 89.7 ms  (22 tok/s)
+decode B=4 T=2048: 148.8 ms  (27 tok/s)
+decode B=8 T=2048: 270.1 ms  (30 tok/s)
+decode B=16 T=2048: 461.9 ms  (35 tok/s)
+decode B=32 T=2048: 902.4 ms  (35 tok/s)
+fit: {'a': 0.03906763287279518, 'c': 0.00047953619027337184, 'e': 1.2739536481210885e-05, 'r2': 0.9972158688088836, 'p0': -0.0898607435371172, 'p1': 0.0009567270215556661}
+{"model_id": "Qwen/Qwen2.5-1.5B-Instruct", "precision": "int8", "device": "mps", "device_name": "Apple silicon GPU (MPS)", "load_seconds": 4.89, "weight_bytes_measured": 1984912384, "weight_bytes_tensors": 1545460736, "n_params_or_codes": 1543656960, "quant": {"backend": "native", "bits": 8, "group_size": 64, "n_linear": 197, "params_quantized": 1543569408, "params_total": 1543714304, "bytes_before": 3087436032, "bytes_after": 1545460736}, "fast_gqa": true, "kv_bytes_per_token": 28672}
+prefill L=32: 180.5 ms
+prefill L=128: 538.4 ms
+prefill L=256: 644.1 ms
+prefill L=512: 1118.4 ms
+prefill L=1024: 2157.4 ms
