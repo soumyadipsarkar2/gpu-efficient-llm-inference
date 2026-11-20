@@ -34,6 +34,16 @@ plt.rcParams.update({
 })
 
 
+def _log2(ax, axis="x"):
+    """Log2 axis labelled with plain numbers (1, 2, 4, ...)."""
+    from matplotlib.ticker import FuncFormatter, LogLocator
+
+    a = ax.xaxis if axis == "x" else ax.yaxis
+    (ax.set_xscale if axis == "x" else ax.set_yscale)("log", base=2)
+    a.set_major_locator(LogLocator(base=2))
+    a.set_major_formatter(FuncFormatter(lambda v, _: f"{v:g}"))
+
+
 def _load(p: Path):
     return json.loads(p.read_text())
 
@@ -70,7 +80,7 @@ def fig_gqa():
         for d, lab, col in [(slow, "HF repeat_kv", C[1]), (fast, "GQA-aware (ours)", C[0])]:
             pts = sorted((r["B"], r["s"] * 1000) for r in d["decode"] if r["T"] == T)
             ax.plot([p[0] for p in pts], [p[1] for p in pts], "-o", color=col, label=lab)
-        ax.set_xscale("log", base=2)
+        _log2(ax)
         ax.set_xlabel("batch size")
         ax.set_title(f"context {T} tokens")
         ax.set_ylim(bottom=0)
@@ -108,7 +118,7 @@ def fig_precision():
         for i, k in enumerate(keys):
             pts = sorted((r["B"], r["B"] / r["s"]) for r in pr[k]["decode"] if r["T"] == 512)
             axes[1].plot([p[0] for p in pts], [p[1] for p in pts], "-o", color=C[i], label=PREC_LABEL[k])
-        axes[1].set_xscale("log", base=2)
+        _log2(axes[1])
         axes[1].set_xlabel("batch size (context 512)")
         axes[1].set_ylabel("decode tokens / s")
         axes[1].set_title("(b) decode throughput")
@@ -117,7 +127,7 @@ def fig_precision():
         for i, k in enumerate(keys):
             pts = sorted((r["L"], r["s"] * 1000) for r in pr[k]["prefill"])
             axes[2].plot([p[0] for p in pts], [p[1] for p in pts], "-o", color=C[i], label=PREC_LABEL[k])
-        axes[2].set_xscale("log", base=2)
+        _log2(axes[2])
         axes[2].set_yscale("log")
         axes[2].set_xlabel("prompt tokens")
         axes[2].set_ylabel("prefill latency (ms)")
@@ -206,7 +216,7 @@ def fig_batching():
         cs = sorted(data[name])
         for ax, (m, yl, t) in zip(axes, metrics):
             ax.plot(cs, [data[name][c][m] for c in cs], "-o", color=col, label=lab)
-            ax.set_xscale("log", base=2)
+            _log2(ax)
             ax.set_xlabel("concurrent clients")
             ax.set_ylabel(yl)
             ax.set_title(t)
@@ -273,7 +283,7 @@ def fig_scaling():
             rows.append({"replicas": k, "concurrency": c, **{m: data[k][c].get(m) for m in
                          ["throughput_tok_s", "e2e_p50", "e2e_p95", "ttft_p95", "mem_peak_bytes"]}})
     for ax in axes:
-        ax.set_xscale("log", base=2)
+        _log2(ax)
         ax.set_xlabel("concurrent clients")
     axes[0].set_ylabel("output tokens / s")
     axes[1].set_ylabel("P95 end-to-end (s)")
