@@ -88,7 +88,15 @@ class Cluster:
         for w in self.specs:
             self.procs[w.url] = self._spawn(f"worker_{w.port}", w.argv())
         for w in self.specs:
-            _wait_healthy(w.url, timeout, self.procs[w.url])
+            try:
+                _wait_healthy(w.url, timeout, self.procs[w.url])
+            except (TimeoutError, RuntimeError):
+                # MPS start-up occasionally stalls right after another process released the
+                # GPU; restart the worker once before giving up.
+                _kill(self.procs[w.url])
+                time.sleep(5)
+                self.procs[w.url] = self._spawn(f"worker_{w.port}_retry", w.argv())
+                _wait_healthy(w.url, timeout, self.procs[w.url])
 
     def start_router(self, policy: str | None = None, timeout: float = 120) -> None:
         self.stop_router()
