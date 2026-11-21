@@ -331,3 +331,13 @@ ppl 17.980469060100333
 arc {'n': 2376, 'acc': 0.6372053872053872, 'acc_norm': 0.5808080808080808}
 agreement {'exact_match': 0.06060606060606061, 'mean_prefix_frac': 0.19569316532172193}
 Token indices sequence length is longer than the specified maximum sequence length for this model (299078 > 131072). Running this sequence through the model will result in indexing errors
+ppl 10.654235253212644
+arc {'n': 1000, 'acc': 0.762, 'acc_norm': 0.769}
+Token indices sequence length is longer than the specified maximum sequence length for this model (299078 > 131072). Running this sequence through the model will result in indexing errors
+ppl 10.690787646160496
+arc {'n': 1000, 'acc': 0.756, 'acc_norm': 0.761}
+agreement {'exact_match': 0.6060606060606061, 'mean_prefix_frac': 0.7068040514866534}
+Token indices sequence length is longer than the specified maximum sequence length for this model (299078 > 131072). Running this sequence through the model will result in indexing errors
+ppl 12.295623763536973
+arc {'n': 1000, 'acc': 0.713, 'acc_norm': 0.687}
+agreement {'exact_match': 0.06060606060606061, 'mean_prefix_frac': 0.18574349903275603}

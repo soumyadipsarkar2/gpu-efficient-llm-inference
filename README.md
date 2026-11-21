@@ -367,7 +367,26 @@ Observations:
      speed).
    * INT4 only when nothing else fits.
 
-The 1.5B quality results will be added when they finish.
+**Qwen2.5-1.5B** (ARC-Easy on the first 1,000 test questions, 95% CI about ±2.7 points;
+agreement measured against 1.5B FP16):
+
+| Precision | Weights (MiB) | Perplexity ↓ | ARC-Easy acc. ↑ | Exact match vs FP16 | Prefix match vs FP16 |
+|---|---|---|---|---|---|
+| FP16 (reference) | 2944 | 10.65 | 76.2% | – | – |
+| INT8 (W8) | 1474 | 10.69 | 75.6% | 60.6% | 70.7% |
+| INT4 (W4, g64) | 828 | 12.30 (+15%) | 71.3% (−4.9) | 6.1% | 18.6% |
+
+The pattern repeats at 3× the model size: INT8 is quality-neutral, and INT4
+round-to-nearest is not. INT4's relative perplexity loss is smaller for the larger
+model (+15% vs. +21%), but its ARC-Easy loss is larger (−4.9 vs. −2.3 points).
+Perplexity alone would understate the downstream cost of 4-bit weights. The larger
+model's INT8 outputs also stay closer to its FP16 outputs (60.6% vs. 39.4% exact
+match; the 0.5B reference is FP32), consistent with larger models being more robust
+to weight noise. The 1.5B model at INT4 (828 MiB) still scores better than the 0.5B
+model at full precision (71.3% vs. 65.6% ARC-Easy, perplexity 12.3 vs. 15.8) in less
+memory than 0.5B FP16 (942 MiB). Under a memory limit, a larger quantized model can
+beat a smaller full-precision one.
+
 
 ### E3–E7. Remaining experiments
 
@@ -449,7 +468,7 @@ python -m analysis.figures                # all figures + report/tables.json
 | E1 precision profiles, 0.5B (6 formats) | ✅ done (clean re-measure) |
 | E1 precision profiles, 1.5B | ✅ done |
 | E2 quality, 0.5B (6 formats) | ✅ done |
-| E2 quality, 1.5B | ⏳ running |
+| E2 quality, 1.5B (3 formats) | ✅ done |
 | E3 batching | ⏳ pending |
 | E4 scaling | ⏳ pending |
 | E5 routing (live) | ⏳ pending |
