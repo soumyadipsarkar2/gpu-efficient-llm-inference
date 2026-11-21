@@ -167,15 +167,18 @@ def fig_tradeoff():
     if not q or not pr:
         return
     fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.8))
+    label = dict(PREC_LABEL, fp16="FP16 = BF16")
+    offset = {"fp32": (-8, 8), "int8": (-14, 8), "int4_noemb": (6, 4), "int4": (6, 4), "fp16": (-4, 8)}
     for i, k in enumerate([k for k in PREC_ORDER if k in pr]):
         run = f"qwen0.5b_{k}"
-        if run not in q:
+        if run not in q or k == "bf16":  # BF16 coincides with FP16 in both quality and speed
             continue
         d = {r["B"]: r["s"] for r in pr[k]["decode"] if r["T"] == 512}
         mem = pr[k]["info"]["weight_bytes_tensors"] / 2**20
         for ax, x in [(axes[0], mem), (axes[1], 32 / d[32])]:
             ax.scatter([x], [q[run]["ppl"]], s=60, color=C[i], edgecolor="white", linewidth=1.5, zorder=3)
-            ax.annotate(PREC_LABEL[k], (x, q[run]["ppl"]), xytext=(5, 4), textcoords="offset points", fontsize=7)
+            ax.annotate(label[k], (x, q[run]["ppl"]), xytext=offset.get(k, (5, 4)), textcoords="offset points",
+                        fontsize=7, color=INK)
     axes[0].set_xlabel("weight memory (MiB)  - lower is better")
     axes[1].set_xlabel("decode tok/s at batch 32  - higher is better")
     axes[0].set_ylabel("WikiText-2 perplexity  - lower is better")

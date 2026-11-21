@@ -185,6 +185,94 @@
    "tok_s_b1": 22.61911428719716,
    "tok_s_b32": 224.99033216351276,
    "tok_s_bmax": 224.99033216351276
+  },
+  {
+   "precision": "int8",
+   "weight_mib": 1473.8662109375,
+   "load_s": 4.89,
+   "kv_bytes_per_token": 28672,
+   "prefill_512_ms": 1118.3805410000787,
+   "tok_s_b1": 6.036665195228395,
+   "tok_s_b32": 107.78582031215595,
+   "tok_s_bmax": 107.78582031215595
+  },
+  {
+   "precision": "int4",
+   "weight_mib": 828.318603515625,
+   "load_s": 5.23,
+   "kv_bytes_per_token": 28672,
+   "prefill_512_ms": 958.2616669999879,
+   "tok_s_b1": 2.6529570723732356,
+   "tok_s_b32": 66.45501436829375,
+   "tok_s_bmax": 66.45501436829375
+  }
+ ],
+ "quality": [
+  {
+   "run": "qwen0.5b_bf16",
+   "precision": "bf16",
+   "model": "Qwen/Qwen2.5-0.5B-Instruct",
+   "ppl": 15.804580812032444,
+   "arc_acc": 0.6540404040404041,
+   "arc_acc_norm": 0.6018518518518519,
+   "exact_match": 0.696969696969697,
+   "prefix_frac": 0.8119478560655031,
+   "weight_mib": 942.2957763671875
+  },
+  {
+   "run": "qwen0.5b_fp16",
+   "precision": "fp16",
+   "model": "Qwen/Qwen2.5-0.5B-Instruct",
+   "ppl": 15.789127808111546,
+   "arc_acc": 0.6565656565656566,
+   "arc_acc_norm": 0.6035353535353535,
+   "exact_match": 0.8787878787878788,
+   "prefix_frac": 0.9488636363636364,
+   "weight_mib": 942.2957763671875
+  },
+  {
+   "run": "qwen0.5b_fp32",
+   "precision": "fp32",
+   "model": "Qwen/Qwen2.5-0.5B-Instruct",
+   "ppl": 15.793018475073401,
+   "arc_acc": 0.6557239057239057,
+   "arc_acc_norm": 0.6035353535353535,
+   "exact_match": null,
+   "prefix_frac": null,
+   "weight_mib": 1884.5885009765625
+  },
+  {
+   "run": "qwen0.5b_int4",
+   "precision": "int4",
+   "model": "Qwen/Qwen2.5-0.5B-Instruct",
+   "ppl": 19.041639138813835,
+   "arc_acc": 0.6325757575757576,
+   "arc_acc_norm": 0.5879629629629629,
+   "exact_match": 0.0,
+   "prefix_frac": 0.14532924638477768,
+   "weight_mib": 265.1209716796875
+  },
+  {
+   "run": "qwen0.5b_int4_noemb",
+   "precision": "int4",
+   "model": "Qwen/Qwen2.5-0.5B-Instruct",
+   "ppl": 17.980469060100333,
+   "arc_acc": 0.6372053872053872,
+   "arc_acc_norm": 0.5808080808080808,
+   "exact_match": 0.06060606060606061,
+   "prefix_frac": 0.19569316532172193,
+   "weight_mib": 451.7489013671875
+  },
+  {
+   "run": "qwen0.5b_int8",
+   "precision": "int8",
+   "model": "Qwen/Qwen2.5-0.5B-Instruct",
+   "ppl": 15.752045075583558,
+   "arc_acc": 0.6624579124579124,
+   "arc_acc_norm": 0.6056397306397306,
+   "exact_match": 0.3939393939393939,
+   "prefix_frac": 0.6444766298797041,
+   "weight_mib": 472.0875244140625
   }
  ]
 }

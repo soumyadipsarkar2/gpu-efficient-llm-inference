@@ -3,9 +3,9 @@
 **CSCE 685 Directed Studies, final report** · Soumyadip Sarkar
 
 > **Status (in progress).** The serving framework is complete and tested. This report
-> currently covers the kernel-level and precision experiments (E0, E1). The quality,
-> batching, scaling, routing, fault-tolerance and simulation experiments (E2–E7) are
-> implemented and scripted, and their results will be added here as each run completes.
+> currently covers the kernel-level, precision and quality experiments (E0–E2). The
+> batching, scaling, routing, fault-tolerance and simulation experiments (E3–E7) are
+> implemented and running; their results will be added here as each completes.
 > See [Experiment status](#9-experiment-status).
 
 ---
@@ -37,6 +37,8 @@ with bit-identical outputs. Weight quantization cuts resident model memory by
 per-step dequantization makes decode **2× (INT8) to 4× (INT4) slower** than FP16 at batch 1.
 The gap narrows as batch size grows, because the dequantization cost is paid once
 per step regardless of how many sequences are in the batch.
+INT8 is quality-neutral (perplexity and ARC-Easy accuracy unchanged vs. FP32), while
+round-to-nearest INT4 costs 21% perplexity and 2.3 ARC-Easy points.
 
 ---
 
@@ -318,13 +320,61 @@ step at batch 1 (23 tok/s) and 142 ms at batch 32 (225 tok/s).
 
 *Figure 3. Qwen2.5-1.5B profile.*
 
-### E2–E7. Remaining experiments
+### E2. Quality vs. precision
+
+Three automated metrics on Qwen2.5-0.5B (`bench/quality.py`):
+
+* **Perplexity** on WikiText-2 (test split, 40 × 1024 tokens).
+* **ARC-Easy** zero-shot accuracy on all 2,376 test questions, scored by
+  log-likelihood. 95% CI is about ±1.9 points.
+* **Greedy agreement with FP32** on 33 chat prompts from the benchmark workload, 64
+  generated tokens each, produced through the serving engine. *Exact* is the share of
+  identical outputs; *prefix* is the mean share of each output generated before the
+  first differing token.
+
+| Precision | Weights (MiB) | Perplexity ↓ | ARC-Easy acc. ↑ | ARC acc. (len-norm) | Exact match vs FP32 | Prefix match vs FP32 |
+|---|---|---|---|---|---|---|
+| FP32 (reference) | 1885 | 15.79 | 65.6% | 60.4% | – | – |
+| FP16 | 942 | 15.79 | 65.7% | 60.4% | 87.9% | 94.9% |
+| BF16 | 942 | 15.80 | 65.4% | 60.2% | 69.7% | 81.2% |
+| INT8 (W8) | 472 | 15.75 | 66.2% | 60.6% | 39.4% | 64.4% |
+| INT4 (W4, g64) | 265 | 19.04 (+21%) | 63.3% (−2.3) | 58.8% | 0.0% | 14.5% |
+| INT4, FP16 emb/head | 452 | 17.98 (+14%) | 63.7% (−1.9) | 58.1% | 6.1% | 19.6% |
+
+![trade-off](report/figures/e2_tradeoff.png)
+
+*Figure 4. Quality–efficiency trade-off for Qwen2.5-0.5B. Left: perplexity vs. resident
+weight memory. Right: perplexity vs. decode throughput at batch 32.*
+
+Observations:
+
+1. **16-bit and 8-bit weights are quality-neutral.** FP16, BF16 and INT8 match FP32
+   perplexity within 0.3% and ARC-Easy accuracy within the confidence interval.
+   Per-channel INT8 is a free 2× (FP16 → INT8) or 4× (FP32 → INT8) memory saving
+   for this model.
+2. **4-bit round-to-nearest has a visible cost** on a model this small: +21%
+   perplexity and −2.3 points on ARC-Easy. Keeping the embedding/LM head in FP16
+   recovers about a third of the perplexity loss for 187 MiB. Calibrated methods
+   (GPTQ/AWQ) are the expected fix.
+3. **Benchmark-neutral is not output-identical.** INT8 leaves both benchmarks
+   unchanged, yet only 39% of its 64-token greedy outputs are word-for-word identical
+   to FP32. Once a near-tie token flips, the continuation diverges. Even BF16 differs
+   from FP32 on 30% of prompts. Systems that cache, test or compare exact outputs
+   should pin the precision.
+4. **Practical operating points on this hardware:**
+   * FP16 when speed matters.
+   * INT8 when memory is the constraint (no measurable quality loss, about half the
+     speed).
+   * INT4 only when nothing else fits.
+
+The 1.5B quality results will be added when they finish.
+
+### E3–E7. Remaining experiments
 
 These are implemented and scripted; their results will be added as each completes.
 
 | ID | Experiment | Design |
 |---|---|---|
-| E2 | Quality vs. precision | WikiText-2 perplexity (40 × 1024 tokens); ARC-Easy zero-shot accuracy (2,376 questions, log-likelihood); greedy-output agreement with FP32 on 48 workload prompts |
 | E3 | Batching | Single worker; serial vs. static (B = 8/32, 50 ms window) vs. continuous (B = 8/32/64); closed-loop concurrency 1–64; open-loop window sweep 0–400 ms |
 | E4 | Scaling | 1, 2 and 3 replicated workers behind the router; concurrency 4–128; saturation point |
 | E5 | Routing (live) | Heterogeneous pool (FP16; INT8; memory-starved FP16) and homogeneous pool; 4 policies × Poisson / bursty / heavy-tail traces |
@@ -397,8 +447,9 @@ python -m analysis.figures                # all figures + report/tables.json
 |---|---|
 | E0 GQA kernel ablation | ✅ done |
 | E1 precision profiles, 0.5B (6 formats) | ✅ done (clean re-measure) |
-| E1 precision profiles, 1.5B | FP16 ✅ · INT8/INT4 pending |
-| E2 quality | ⏳ pending |
+| E1 precision profiles, 1.5B | ✅ done |
+| E2 quality, 0.5B (6 formats) | ✅ done |
+| E2 quality, 1.5B | ⏳ running |
 | E3 batching | ⏳ pending |
 | E4 scaling | ⏳ pending |
 | E5 routing (live) | ⏳ pending |

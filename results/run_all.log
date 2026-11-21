@@ -249,3 +249,85 @@ prefill L=128: 538.4 ms
 prefill L=256: 644.1 ms
 prefill L=512: 1118.4 ms
 prefill L=1024: 2157.4 ms
+prefill L=2048: 5413.9 ms
+decode B=1 T=128: 165.0 ms  (6 tok/s)
+decode B=2 T=128: 230.9 ms  (9 tok/s)
+decode B=4 T=128: 247.8 ms  (16 tok/s)
+decode B=8 T=128: 380.1 ms  (21 tok/s)
+decode B=16 T=128: 237.4 ms  (67 tok/s)
+decode B=32 T=128: 269.4 ms  (119 tok/s)
+decode B=1 T=512: 165.7 ms  (6 tok/s)
+decode B=2 T=512: 197.4 ms  (10 tok/s)
+decode B=4 T=512: 245.8 ms  (16 tok/s)
+decode B=8 T=512: 352.8 ms  (23 tok/s)
+decode B=16 T=512: 248.1 ms  (64 tok/s)
+decode B=32 T=512: 296.9 ms  (108 tok/s)
+decode B=1 T=1024: 165.5 ms  (6 tok/s)
+decode B=2 T=1024: 200.4 ms  (10 tok/s)
+decode B=4 T=1024: 294.8 ms  (14 tok/s)
+decode B=8 T=1024: 393.3 ms  (20 tok/s)
+decode B=16 T=1024: 260.3 ms  (61 tok/s)
+decode B=32 T=1024: 308.8 ms  (104 tok/s)
+decode B=1 T=2048: 170.7 ms  (6 tok/s)
+decode B=2 T=2048: 196.3 ms  (10 tok/s)
+decode B=4 T=2048: 253.0 ms  (16 tok/s)
+decode B=8 T=2048: 366.2 ms  (22 tok/s)
+decode B=16 T=2048: 263.6 ms  (61 tok/s)
+decode B=32 T=2048: 1091.6 ms  (29 tok/s)
+fit: {'a': 0.20223212263494414, 'c': -0.0011746771048996402, 'e': 1.0451588080682191e-05, 'r2': 0.6653748542415545, 'p0': -0.014921178982944792, 'p1': 0.0025355716014744296}
+{"model_id": "Qwen/Qwen2.5-1.5B-Instruct", "precision": "int4", "device": "mps", "device_name": "Apple silicon GPU (MPS)", "load_seconds": 5.23, "weight_bytes_measured": 1479741696, "weight_bytes_tensors": 868555008, "n_params_or_codes": 771872256, "quant": {"backend": "native", "bits": 4, "group_size": 64, "n_linear": 197, "params_quantized": 1543569408, "params_total": 1543714304, "bytes_before": 3087436032, "bytes_after": 868555008}, "fast_gqa": true, "kv_bytes_per_token": 28672}
+prefill L=32: 367.5 ms
+prefill L=128: 474.7 ms
+prefill L=256: 620.7 ms
+prefill L=512: 958.3 ms
+prefill L=1024: 2051.2 ms
+prefill L=2048: 4396.4 ms
+decode B=1 T=128: 371.5 ms  (3 tok/s)
+decode B=2 T=128: 405.2 ms  (5 tok/s)
+decode B=4 T=128: 456.8 ms  (9 tok/s)
+decode B=8 T=128: 554.1 ms  (14 tok/s)
+decode B=16 T=128: 437.0 ms  (37 tok/s)
+decode B=32 T=128: 458.3 ms  (70 tok/s)
+decode B=1 T=512: 376.9 ms  (3 tok/s)
+decode B=2 T=512: 403.5 ms  (5 tok/s)
+decode B=4 T=512: 462.0 ms  (9 tok/s)
+decode B=8 T=512: 578.4 ms  (14 tok/s)
+decode B=16 T=512: 450.9 ms  (35 tok/s)
+decode B=32 T=512: 481.5 ms  (66 tok/s)
+decode B=1 T=1024: 376.6 ms  (3 tok/s)
+decode B=2 T=1024: 408.1 ms  (5 tok/s)
+decode B=4 T=1024: 465.0 ms  (9 tok/s)
+decode B=8 T=1024: 585.5 ms  (14 tok/s)
+decode B=16 T=1024: 485.8 ms  (33 tok/s)
+decode B=32 T=1024: 510.6 ms  (63 tok/s)
+decode B=1 T=2048: 394.1 ms  (3 tok/s)
+decode B=2 T=2048: 429.7 ms  (5 tok/s)
+decode B=4 T=2048: 489.3 ms  (8 tok/s)
+decode B=8 T=2048: 613.7 ms  (13 tok/s)
+decode B=16 T=2048: 519.8 ms  (31 tok/s)
+decode B=32 T=2048: 9857.5 ms  (3 tok/s)
+fit: {'a': 0.08438649632274431, 'c': -0.037345673067304505, 'e': 0.000119550418380182, 'r2': 0.658785057397802, 'p0': 0.1285424085898228, 'p1': 0.00202439166861528}
+Token indices sequence length is longer than the specified maximum sequence length for this model (299078 > 131072). Running this sequence through the model will result in indexing errors
+ppl 15.793018475073401
+arc {'n': 2376, 'acc': 0.6557239057239057, 'acc_norm': 0.6035353535353535}
+Token indices sequence length is longer than the specified maximum sequence length for this model (299078 > 131072). Running this sequence through the model will result in indexing errors
+ppl 15.789127808111546
+arc {'n': 2376, 'acc': 0.6565656565656566, 'acc_norm': 0.6035353535353535}
+agreement {'exact_match': 0.8787878787878788, 'mean_prefix_frac': 0.9488636363636364}
+Token indices sequence length is longer than the specified maximum sequence length for this model (299078 > 131072). Running this sequence through the model will result in indexing errors
+ppl 15.804580812032444
+arc {'n': 2376, 'acc': 0.6540404040404041, 'acc_norm': 0.6018518518518519}
+agreement {'exact_match': 0.696969696969697, 'mean_prefix_frac': 0.8119478560655031}
+Token indices sequence length is longer than the specified maximum sequence length for this model (299078 > 131072). Running this sequence through the model will result in indexing errors
+ppl 15.752045075583558
+arc {'n': 2376, 'acc': 0.6624579124579124, 'acc_norm': 0.6056397306397306}
+agreement {'exact_match': 0.3939393939393939, 'mean_prefix_frac': 0.6444766298797041}
+Token indices sequence length is longer than the specified maximum sequence length for this model (299078 > 131072). Running this sequence through the model will result in indexing errors
+ppl 19.041639138813835
+arc {'n': 2376, 'acc': 0.6325757575757576, 'acc_norm': 0.5879629629629629}
+agreement {'exact_match': 0.0, 'mean_prefix_frac': 0.14532924638477768}
+Token indices sequence length is longer than the specified maximum sequence length for this model (299078 > 131072). Running this sequence through the model will result in indexing errors
+ppl 17.980469060100333
+arc {'n': 2376, 'acc': 0.6372053872053872, 'acc_norm': 0.5808080808080808}
+agreement {'exact_match': 0.06060606060606061, 'mean_prefix_frac': 0.19569316532172193}
+Token indices sequence length is longer than the specified maximum sequence length for this model (299078 > 131072). Running this sequence through the model will result in indexing errors
