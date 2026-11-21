@@ -407,3 +407,19 @@ python(17535) MallocStackLogging: can't turn off malloc stack logging because it
   continuous_b64_c8.json: ok=32/32 thr=44 tok/s e2e_p50=11.05s p95=32.20s ttft_p50=0.46s p95=4.09s  [61s]
   continuous_b64_c16.json: ok=64/64 thr=64 tok/s e2e_p50=17.41s p95=52.35s ttft_p50=0.83s p95=9.26s  [102s]
 [batching] serial
+  serial_c1.json: ok=24/24 thr=28 tok/s e2e_p50=1.69s p95=8.95s ttft_p50=0.17s p95=1.01s  [78s]
+  serial_c2.json: ok=24/24 thr=28 tok/s e2e_p50=5.92s p95=11.02s ttft_p50=2.28s p95=8.39s  [78s]
+  serial_c4.json: ok=24/24 thr=30 tok/s e2e_p50=10.45s p95=17.26s ttft_p50=8.15s p95=12.90s  [73s]
+  serial_c8.json: ok=32/32 thr=31 tok/s e2e_p50=20.24s p95=29.62s ttft_p50=18.62s p95=27.94s  [87s]
+[batching] static_b8_w50
+  static_b8_w50_c1.json: ok=24/24 thr=28 tok/s e2e_p50=1.76s p95=9.29s ttft_p50=0.22s p95=1.12s  [79s]
+  static_b8_w50_c4.json: ok=24/24 thr=24 tok/s e2e_p50=11.02s p95=26.90s ttft_p50=4.63s p95=10.69s  [90s]
+  static_b8_w50_c8.json: ok=32/32 thr=32 tok/s e2e_p50=16.92s p95=30.92s ttft_p50=7.46s p95=18.54s  [84s]
+  static_b8_w50_c16.json: ok=64/64 thr=31 tok/s e2e_p50=42.12s p95=80.51s ttft_p50=32.25s p95=57.94s  [211s]
+  static_b8_w50_c32.json: ok=128/128 thr=36 tok/s e2e_p50=83.21s p95=98.51s ttft_p50=73.58s p95=82.51s  [351s]
+[batching] static_b32_w50
+  static_b32_w50_c1.json: ok=24/24 thr=27 tok/s e2e_p50=1.75s p95=9.02s ttft_p50=0.22s p95=1.29s  [81s]
+  static_b32_w50_c4.json: ok=24/24 thr=23 tok/s e2e_p50=11.48s p95=27.98s ttft_p50=5.03s p95=11.14s  [95s]
+  static_b32_w50_c8.json: ok=32/32 thr=31 tok/s e2e_p50=18.00s p95=33.00s ttft_p50=8.35s p95=19.03s  [87s]
+  static_b32_w50_c16.json: ok=64/64 thr=37 tok/s e2e_p50=36.59s p95=65.68s ttft_p50=18.94s p95=27.59s  [174s]
+[batching] continuous_b8

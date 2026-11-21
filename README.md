@@ -2,11 +2,11 @@
 
 **CSCE 685 Directed Studies, final report** · Soumyadip Sarkar
 
-> **Status (in progress).** The serving framework is complete and tested. This report
-> currently covers the kernel-level, precision and quality experiments (E0–E2). The
-> batching, scaling, routing, fault-tolerance and simulation experiments (E3–E7) are
-> implemented and running; their results will be added here as each completes.
-> See [Experiment status](#9-experiment-status).
+> **Status (paused, in progress).** The serving framework is complete and tested. This
+> report covers the kernel-level, precision, quality and batching experiments (E0–E3).
+> The scaling, routing, fault-tolerance and simulation experiments (E4–E7) are
+> implemented and scripted but not yet run. See
+> [Experiment status](#9-experiment-status) and [Resuming the experiments](#10-resuming-the-experiments).
 
 ---
 
@@ -38,7 +38,12 @@ per-step dequantization makes decode **2× (INT8) to 4× (INT4) slower** than FP
 The gap narrows as batch size grows, because the dequantization cost is paid once
 per step regardless of how many sequences are in the batch.
 INT8 is quality-neutral (perplexity and ARC-Easy accuracy unchanged vs. FP32), while
-round-to-nearest INT4 costs 21% perplexity and 2.3 ARC-Easy points.
+round-to-nearest INT4 costs 21% perplexity and 2.3 ARC-Easy points. A 1.5B model at INT4 still beats
+the 0.5B model at FP16 in less memory. Continuous batching reaches **2.3× the peak
+throughput** of request-level batching and cuts median time-to-first-token by an order
+of magnitude at moderate load. It also exposed an allocator pathology: the
+ever-changing KV-cache shape made the GPU's caching allocator reserve more memory than
+the machine has. A periodic cache release fixed it and raised throughput by about 35%.
 
 ---
 
@@ -388,14 +393,88 @@ memory than 0.5B FP16 (942 MiB). Under a memory limit, a larger quantized model 
 beat a smaller full-precision one.
 
 
-### E3. Batching policies (re-running)
+### E3. Batching policies
 
-**An allocator bug was found and fixed during this experiment, so it is being re-run.**
-The first pass is archived in `results/batching_allocator_bloat/`.
+Single FP16 worker, Qwen2.5-0.5B, closed-loop clients replaying the *balanced* trace.
+That trace averages about 450 prompt tokens and 83 output tokens per request
+(prefill-heavy, like summarization or RAG). Client-side measurements; output lengths
+are fixed with `ignore_eos`. Each concurrency level replays the first
+`min(max(4 × clients, 24), 256)` requests of the same trace.
 
-* **Symptom.** Throughput fell as concurrency rose: continuous batching with batch
-  limit 32 dropped from 69 tok/s at 16 clients to 46 tok/s at 32 clients. The batch
-  limit 64 worker eventually managed one decode step every ~10 s.
+![batching](report/figures/e3_batching.png)
+
+*Figure 5. Throughput, P95 TTFT and P95 end-to-end latency vs. concurrent clients.
+Solid lines: runs with the allocator fix (below). Dashed lines: continuous batching
+from the first pass, before the fix. The leak only slowed runs down, so the dashed
+lines are lower bounds.*
+
+**Serial and static batching (with the allocator fix):**
+
+| Policy | Clients | Output tok/s | Median TTFT (s) | Median e2e (s) | P95 e2e (s) | Mean active batch | KV padding overhead |
+|---|---|---|---|---|---|---|---|
+| serial | 1 | 28 | 0.2 | 1.7 | 9.0 | 0.9 | 0% |
+| serial | 8 | 31 | 18.6 | 20.2 | 29.6 | 0.9 | 0% |
+| static B=8, 50 ms | 8 | 32 | 7.5 | 16.9 | 30.9 | 3.8 | 88% |
+| static B=8, 50 ms | 16 | 31 | 32.2 | 42.1 | 80.5 | 4.2 | 83% |
+| static B=8, 50 ms | 32 | 36 | 73.6 | 83.2 | 98.5 | 4.4 | 124% |
+| static B=32, 50 ms | 8 | 31 | 8.3 | 18.0 | 33.0 | 3.7 | 92% |
+| static B=32, 50 ms | 16 | 37 | 18.9 | 36.6 | 65.7 | 7.4 | 107% |
+
+**Continuous batching:**
+
+| Batch limit | Clients | Output tok/s | Median TTFT (s) | Median e2e (s) | P95 e2e (s) |
+|---|---|---|---|---|---|
+| B=8 (pre-fix) | 8 | 51 | 0.43 | 8.7 | 27.5 |
+| B=8 (pre-fix) | 16 | 66 | 9.9 | 21.1 | 40.5 |
+| B=8 (pre-fix) | 32 | 69 | 34.3 | 43.3 | 61.0 |
+| B=32 (pre-fix) | 4 | 44 | 0.11 | 4.0 | 18.0 |
+| B=32 (pre-fix) | 16 | 69 | 0.82 | 15.8 | 49.3 |
+| B=32 (pre-fix) | 64 | 83 | 32.9 | 60.0 | 104.8 |
+| **B=64, with fix** | **16** | **86** | **0.47** | **12.8** | **34.6** |
+| **B=64, with fix** | **32** | **82** | **0.81** | **28.7** | **78.9** |
+
+The two "with fix" rows come from the fix-verification run (same trace, same
+concurrency sequence on one worker). The full continuous-batching sweep with the fix
+has not yet been re-run.
+
+**Findings:**
+
+1. **Serial saturates at about 30 tok/s.** Throughput does not grow with clients;
+   every additional client only adds queueing (median TTFT 0.2 s → 18.6 s from 1 to
+   8 clients).
+2. **Request-level (static) batching barely helps on this workload: 31–37 tok/s.**
+   * A batch must wait for its longest member, so batches drain and average occupancy
+     stays at about 4–7 even with 16–32 clients.
+   * Padding every prompt to the longest one inflates the stored KV cache by 83–124%.
+3. **Static batching with B = 32 collapses at ≥ 32 clients on this 16 GB machine.**
+   Large padded batches containing 1,500-token prompts drove the system into swap.
+   Even with the allocator fix, the engine fell to about 1 decode step per second, so
+   those levels were dropped from the sweep (the first-pass attempt is in
+   `results/batching_allocator_bloat/`).
+4. **Continuous batching wins on every metric once there are ≥ 4 clients.**
+
+   | | Continuous (pre-fix) | Static | Serial |
+   |---|---|---|---|
+   | Throughput, 8 clients | 51 tok/s | 31–32 tok/s | 31 tok/s |
+   | Median TTFT, 8 clients | 0.43 s | 7.5–8.3 s | 18.6 s |
+   | Peak throughput (pre-fix) | 83 tok/s | 37 tok/s | 31 tok/s |
+   | Peak throughput (with fix) | 86 tok/s | – | – |
+
+   New requests join the running batch at the next step, and finished ones leave
+   immediately. Peak throughput is 2.3× static and 2.8× serial.
+5. **The batch limit trades throughput against TTFT.** At 16 clients, B = 8 queues
+   requests (median TTFT 9.9 s) while B = 32 admits them all (0.8 s) at similar
+   throughput.
+6. **Prefill does not batch on this GPU.** Prefilling 8 × 512 tokens takes the same
+   time as eight separate 512-token prefills (about 2,200 prompt tok/s). Batching only
+   amortizes decode, and on a prefill-heavy trace that caps the achievable gain.
+
+**Allocator bug found and fixed during this experiment.** The first pass is archived
+in `results/batching_allocator_bloat/`.
+
+* **Symptom.** Throughput fell as concurrency rose: continuous batching with B = 32
+  dropped from 69 tok/s at 16 clients to 46 tok/s at 32 clients. The B = 64 worker
+  eventually managed one decode step every ~10 s.
 * **Cause.** The worker's MPS caching allocator had reserved **17.8 GB**, more than the
   machine's 16 GB of RAM, while under 1 GB was live. macOS was swapping 10.5 GB.
   Continuous batching gives the KV cache a new shape on every step (each new token
@@ -403,8 +482,8 @@ The first pass is archived in `results/batching_allocator_bloat/`.
   every size.
 * **Fix.** Every 16 decode steps the engine compares reserved with allocated memory. If
   the gap exceeds 1 GiB, it returns cached blocks to the driver
-  (`EngineConfig.cache_slack_bytes`, `engine.py`).
-* **Effect.** Re-running the stalled scenario on one worker:
+  (`EngineConfig.cache_slack_bytes` in `engine.py`).
+* **Effect.**
 
   | | Before | After |
   |---|---|---|
@@ -413,25 +492,16 @@ The first pass is archived in `results/batching_allocator_bloat/`.
   | 32 clients | stalled | **82 tok/s** |
   | Overhead of releasing memory | – | 0.4% of run time |
 
-This also explains part of the "memory cliff" seen in E1. The lesson for serving
-systems: a continuously batched KV cache defeats a caching allocator. This is one
-motivation for vLLM's fixed-size paged KV blocks.
+The lesson: a continuously batched, contiguous KV cache defeats a caching allocator.
+This is one motivation for vLLM's fixed-size paged KV blocks.
 
-Two findings from the first pass are independent of the allocator and still stand:
+### E4–E7. Remaining experiments
 
-* **Prefill does not batch on this GPU.** Prefilling 8 × 512 tokens takes the same
-  time as eight separate 512-token prefills (about 2,200 prompt tok/s), so batching
-  only amortizes decode.
-* **Static batching pads heavily.** Request-level batches pad every prompt to the
-  longest one, inflating the stored KV cache by 90–148% on the balanced trace.
-
-### E3–E7. Remaining experiments
-
-These are implemented and scripted; their results will be added as each completes.
+These are implemented and scripted (`bench/experiments.py`, `bench/sim_experiments.py`)
+but have not been run yet.
 
 | ID | Experiment | Design |
 |---|---|---|
-| E3 | Batching | Single worker; serial vs. static (B = 8/32, 50 ms window) vs. continuous (B = 8/32/64); closed-loop concurrency 1–64; open-loop window sweep 0–400 ms |
 | E4 | Scaling | 1, 2 and 3 replicated workers behind the router; concurrency 4–128; saturation point |
 | E5 | Routing (live) | Heterogeneous pool (FP16; INT8; memory-starved FP16) and homogeneous pool; 4 policies × Poisson / bursty / heavy-tail traces |
 | E6 | Fault tolerance | Kill 1 of 3 workers mid-run; failed requests, retries and recovery |
@@ -452,6 +522,18 @@ These are implemented and scripted; their results will be added as each complete
   differences produce workers whose speeds differ several-fold. That is the case where
   a router that knows each worker's step-time model should beat static policies; E5
   and E7 test it.
+* **Continuous batching is the single most valuable serving policy here.** It reaches
+  2.3× the peak throughput of request-level batching and cuts median TTFT by an order of
+  magnitude at moderate load. But it stresses the memory system in a way static batching
+  does not: the KV cache changes shape every step, which bloated the MPS caching
+  allocator to more than the machine's RAM. Production systems avoid this with paged,
+  fixed-size KV blocks (vLLM); a contiguous-cache engine must at least return cached
+  memory periodically.
+* **Prefill-heavy workloads cap batching gains.** On this GPU prefill is compute-bound
+  and does not speed up with batching. When prompts average 450 tokens and outputs 83,
+  a large share of GPU time is prefill, which batching cannot amortize. Chunked prefill
+  (Sarathi-Serve [3]) or prefill/decode disaggregation (DistServe [9], Splitwise [10])
+  target exactly this.
 
 ## 7. Limitations
 
@@ -506,11 +588,43 @@ python -m analysis.figures                # all figures + report/tables.json
 | E1 precision profiles, 1.5B | ✅ done |
 | E2 quality, 0.5B (6 formats) | ✅ done |
 | E2 quality, 1.5B (3 formats) | ✅ done |
-| E3 batching | 🔁 re-running after allocator fix |
+| E3 batching: serial, static | ✅ done (with allocator fix) |
+| E3 batching: continuous sweep | 🟡 first pass done (pre-fix, lower bound); fix verified at B=64, 16/32 clients; full re-run pending |
+| E3 batching: open-loop window sweep | ⏳ pending |
 | E4 scaling | ⏳ pending |
 | E5 routing (live) | ⏳ pending |
 | E6 fault tolerance | ⏳ pending |
 | E7 simulation | ⏳ pending |
+
+## 10. Resuming the experiments
+
+Every experiment writes one JSON per run and skips runs whose output already exists, so
+the pipeline can be stopped and resumed at any time:
+
+```bash
+source .venv/bin/activate
+scripts/resume.sh            # keeps the Mac awake (caffeinate) and runs scripts/run_all.sh
+```
+
+Remaining steps, in order, with approximate times on the M4:
+
+| Step | Command | Time |
+|---|---|---|
+| E3 continuous sweep (B = 8/32/64) + open-loop window sweep | `python -m bench.experiments batching` | ~1 h |
+| E4 scaling | `python -m bench.experiments scaling` | ~40 min |
+| E5 routing (live) | `python -m bench.experiments routing` | ~1 h |
+| E6 fault tolerance | `python -m bench.experiments fault` | ~5 min |
+| E7 simulation (CPU only) | `python -m bench.sim_experiments` | ~30 min |
+| Figures and tables | `python -m analysis.figures` | ~1 min |
+
+Notes for whoever continues:
+
+* Close memory-hungry applications first. The machine has 16 GB of unified memory, and
+  the GPU, the model workers and the OS all share it.
+* `results/logs/` holds each worker's and router's log; a run's JSON holds per-request
+  timings and a telemetry time series (`samples`).
+* `results/profile/first_pass/` and `results/batching_allocator_bloat/` are superseded
+  measurements, kept only as evidence for the two methodology issues described above.
 
 ## References
 

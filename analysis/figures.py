@@ -189,7 +189,7 @@ def fig_tradeoff():
 
 # --------------------------------------------------------------------------- E3 batching
 BATCH_STYLE = {
-    "serial": ("serial (B=1)", C[7]),
+    "serial": ("serial (B=1)", INK2),
     "static_b8_w50": ("static B=8, 50 ms window", C[3]),
     "static_b32_w50": ("static B=32, 50 ms window", C[1]),
     "continuous_b8": ("continuous B=8", C[2]),
@@ -208,6 +208,17 @@ def fig_batching():
         data[j["meta"]["config"]][j["meta"]["concurrency"]] = j["summary"]
     if not data:
         return
+    # configurations not yet re-run after the allocator fix: show the first pass, dashed and
+    # labelled; the leak only slowed runs down, so these are lower bounds on throughput
+    prefix = set()
+    old_dir = RES / "batching_allocator_bloat"
+    if old_dir.exists():
+        for p in old_dir.glob("continuous_*_c*.json"):
+            j = _load(p)
+            cfg = j["meta"]["config"]
+            if cfg not in data or cfg in prefix:
+                prefix.add(cfg)
+                data[cfg][j["meta"]["concurrency"]] = j["summary"]
     fig, axes = plt.subplots(1, 3, figsize=(10, 2.9))
     metrics = [("throughput_tok_s", "output tokens / s", "(a) throughput"),
                ("ttft_p95", "P95 time to first token (s)", "(b) P95 TTFT"),
@@ -217,20 +228,23 @@ def fig_batching():
         if name not in data:
             continue
         cs = sorted(data[name])
+        ls = "--o" if name in prefix else "-o"
+        lab = lab + " (pre-fix)" if name in prefix else lab
         for ax, (m, yl, t) in zip(axes, metrics):
-            ax.plot(cs, [data[name][c][m] for c in cs], "-o", color=col, label=lab)
+            ax.plot(cs, [data[name][c][m] for c in cs], ls, color=col, label=lab)
             _log2(ax)
             ax.set_xlabel("concurrent clients")
             ax.set_ylabel(yl)
             ax.set_title(t)
         for c in cs:
             s = data[name][c]
-            rows.append({"config": name, "concurrency": c, **{k: s.get(k) for k in
+            rows.append({"config": name, "concurrency": c, "pre_fix": name in prefix, **{k: s.get(k) for k in
                          ["throughput_tok_s", "throughput_req_s", "ttft_p50", "ttft_p95", "e2e_p50", "e2e_p95",
                           "tpot_p50", "active_mean", "kv_padding_overhead", "mem_peak_bytes", "busy_last"]}})
     axes[2].set_yscale("log")
     axes[1].set_yscale("log")
-    axes[0].legend(fontsize=7)
+    h, l = axes[0].get_legend_handles_labels()
+    fig.legend(h, l, loc="lower center", ncol=3, fontsize=7, bbox_to_anchor=(0.5, -0.2))
     _save(fig, "e3_batching")
     TABLES["batching"] = rows
 

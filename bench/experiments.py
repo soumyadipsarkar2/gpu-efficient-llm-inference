@@ -58,7 +58,7 @@ def _run(url, tr, out: Path, meta: dict, mode: str, concurrency: int = 1, worker
 BATCH_CONFIGS = [
     ("serial", dict(policy="serial", max_batch=1), [1, 2, 4, 8]),
     ("static_b8_w50", dict(policy="static", max_batch=8, window_ms=50), [1, 4, 8, 16, 32]),
-    ("static_b32_w50", dict(policy="static", max_batch=32, window_ms=50), [1, 4, 8, 16, 32, 64]),
+    ("static_b32_w50", dict(policy="static", max_batch=32, window_ms=50), [1, 4, 8, 16]),  # 32+ clients: collapses under memory pressure on 16 GB (see report)
     ("continuous_b8", dict(policy="continuous", max_batch=8), [1, 4, 8, 16, 32]),
     ("continuous_b32", dict(policy="continuous", max_batch=32), [1, 4, 8, 16, 32, 64]),
     ("continuous_b64", dict(policy="continuous", max_batch=64), [1, 4, 8, 16, 32, 64]),
