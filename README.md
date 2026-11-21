@@ -388,6 +388,56 @@ memory than 0.5B FP16 (942 MiB). Under a memory limit, a larger quantized model 
 beat a smaller full-precision one.
 
 
+### E3. Batching policies (partial: serial and static done, continuous running)
+
+Single FP16 worker, Qwen2.5-0.5B, closed-loop clients replaying the *balanced* trace.
+That trace averages about 450 prompt tokens and 83 output tokens per request, so it is
+prefill-heavy, like summarization or RAG. Client-side measurements; output lengths are
+fixed with `ignore_eos`.
+
+![batching](report/figures/e3_batching.png)
+
+*Figure 5. Throughput, P95 TTFT and P95 end-to-end latency vs. concurrent clients
+(partial; continuous-batching curves will be added).*
+
+| Policy | Clients | Output tok/s | Median TTFT (s) | Median e2e (s) | P95 e2e (s) | Mean active batch | KV padding overhead |
+|---|---|---|---|---|---|---|---|
+| serial | 1 | 29 | 0.2 | 1.6 | 8.5 | 0.9 | 0% |
+| serial | 8 | 31 | 18.0 | 19.2 | 29.1 | 0.9 | 0% |
+| static B=8, 50 ms | 8 | 35 | 7.4 | 15.4 | 28.5 | 3.7 | 90% |
+| static B=8, 50 ms | 32 | 34 | 81.4 | 92.6 | 109.5 | 4.1 | 102% |
+| static B=32, 50 ms | 16 | 37 | 19.1 | 34.7 | 68.0 | 7.2 | 107% |
+| static B=32, 50 ms | 32 | 27 | 35.3 | 86.1 | 234.5 | 15.2 | 148% |
+| static B=32, 50 ms | 64 | 62 | 64.6 | 85.7 | 124.7 | 14.5 | 148% |
+
+Observations so far:
+
+1. **Serial saturates at about 30 tok/s.** Throughput does not grow with clients;
+   TTFT grows linearly as requests queue.
+2. **Request-level (static) batching helps little on this workload.**
+   * A batch must wait for its longest member, so batches drain and average
+     occupancy stays at 4–15 even with 32–64 clients.
+   * Right-padding a batch to its longest prompt inflates the KV cache by 90–148%
+     and wastes prefill compute.
+   * With B = 32 and 32 clients, throughput even *drops* (27 tok/s) and P95 latency
+     reaches 234 s, as large padded batches containing 1,500-token prompts approach
+     the MPS memory cliff (E1).
+3. **Prefill does not batch on this GPU.** Prefilling 8 × 512 tokens takes the same
+   time as eight separate 512-token prefills (about 0.45 ms per token, roughly
+   2,200 tok/s). Prefill is compute-bound, so batching only amortizes *decode*.
+4. **Preliminary engine-level comparison** (same 32 requests, batch limit 8, all
+   submitted at once):
+
+   | Policy | Wall time | Prefill time | Decode time | Mean batch | Output tok/s |
+   |---|---|---|---|---|---|
+   | static | 61 s | 15.5 s | ≥34 s | 3.5 | 43 |
+   | continuous | 37 s | 10.3 s | ≥25 s | 5.9 | 72 |
+
+   Continuous batching gives **1.7× the throughput**, because sequences leave and
+   join every step and occupancy stays high. Decode times are lower bounds: the
+   engine's step-time buffer keeps only the last 512 steps, and each policy has about
+   10 s of busy time that is uncounted decode.
+
 ### E3–E7. Remaining experiments
 
 These are implemented and scripted; their results will be added as each completes.
@@ -469,7 +519,7 @@ python -m analysis.figures                # all figures + report/tables.json
 | E1 precision profiles, 1.5B | ✅ done |
 | E2 quality, 0.5B (6 formats) | ✅ done |
 | E2 quality, 1.5B (3 formats) | ✅ done |
-| E3 batching | ⏳ pending |
+| E3 batching | 🟡 serial + static done; continuous + open-loop running |
 | E4 scaling | ⏳ pending |
 | E5 routing (live) | ⏳ pending |
 | E6 fault tolerance | ⏳ pending |

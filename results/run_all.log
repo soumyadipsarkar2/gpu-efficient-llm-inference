@@ -341,3 +341,49 @@ Token indices sequence length is longer than the specified maximum sequence leng
 ppl 12.295623763536973
 arc {'n': 1000, 'acc': 0.713, 'acc_norm': 0.687}
 agreement {'exact_match': 0.06060606060606061, 'mean_prefix_frac': 0.18574349903275603}
+[batching] serial
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+	- Avoid using `tokenizers` before the fork if possible
+	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+  serial_c1.json: ok=24/24 thr=29 tok/s e2e_p50=1.65s p95=8.48s ttft_p50=0.16s p95=1.00s  [76s]
+  serial_c2.json: ok=24/24 thr=32 tok/s e2e_p50=4.13s p95=9.69s ttft_p50=1.79s p95=7.54s  [68s]
+  serial_c4.json: ok=24/24 thr=32 tok/s e2e_p50=9.57s p95=16.37s ttft_p50=7.73s p95=12.23s  [69s]
+  serial_c8.json: ok=32/32 thr=31 tok/s e2e_p50=19.21s p95=29.11s ttft_p50=18.02s p95=26.82s  [85s]
+[batching] static_b8_w50
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+	- Avoid using `tokenizers` before the fork if possible
+	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+  static_b8_w50_c1.json: ok=24/24 thr=27 tok/s e2e_p50=1.84s p95=8.97s ttft_p50=0.23s p95=1.04s  [81s]
+  static_b8_w50_c4.json: ok=24/24 thr=25 tok/s e2e_p50=10.65s p95=25.26s ttft_p50=3.95s p95=10.56s  [86s]
+  static_b8_w50_c8.json: ok=32/32 thr=35 tok/s e2e_p50=15.39s p95=28.52s ttft_p50=7.40s p95=17.66s  [76s]
+  static_b8_w50_c16.json: ok=64/64 thr=35 tok/s e2e_p50=42.32s p95=68.06s ttft_p50=32.30s p95=47.09s  [187s]
+/Users/soumyadipsarkar/.local/share/uv/python/cpython-3.11.18-macos-aarch64-none/lib/python3.11/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[batching] static_b8_w50
+  static_b8_w50_c32.json: ok=128/128 thr=34 tok/s e2e_p50=92.58s p95=109.54s ttft_p50=81.36s p95=95.70s  [367s]
+[batching] static_b32_w50
+  static_b32_w50_c1.json: ok=24/24 thr=28 tok/s e2e_p50=1.72s p95=8.57s ttft_p50=0.23s p95=1.04s  [78s]
+  static_b32_w50_c4.json: ok=24/24 thr=24 tok/s e2e_p50=11.13s p95=27.26s ttft_p50=4.04s p95=10.76s  [90s]
+  static_b32_w50_c8.json: ok=32/32 thr=31 tok/s e2e_p50=17.71s p95=32.76s ttft_p50=7.64s p95=20.95s  [85s]
+  static_b32_w50_c16.json: ok=64/64 thr=37 tok/s e2e_p50=34.70s p95=67.97s ttft_p50=19.10s p95=29.37s  [174s]
+  static_b32_w50_c32.json: ok=128/128 thr=27 tok/s e2e_p50=86.14s p95=234.45s ttft_p50=35.33s p95=166.43s  [469s]
+  static_b32_w50_c64.json: ok=256/256 thr=62 tok/s e2e_p50=85.73s p95=124.66s ttft_p50=64.57s p95=94.22s  [1357s]
+[batching] continuous_b8
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/soumyadipsarkar/gpu-efficient-llm-inference/bench/experiments.py", line 231, in <module>
+    main()
+  File "/Users/soumyadipsarkar/gpu-efficient-llm-inference/bench/experiments.py", line 221, in main
+    exp_batching()
+  File "/Users/soumyadipsarkar/gpu-efficient-llm-inference/bench/experiments.py", line 77, in exp_batching
+    with Cluster([spec], router_policy=None) as cl:
+  File "/Users/soumyadipsarkar/gpu-efficient-llm-inference/llmserve/cluster.py", line 118, in __enter__
+    self.start_workers()
+  File "/Users/soumyadipsarkar/gpu-efficient-llm-inference/llmserve/cluster.py", line 91, in start_workers
+    _wait_healthy(w.url, timeout, self.procs[w.url])
+  File "/Users/soumyadipsarkar/gpu-efficient-llm-inference/llmserve/cluster.py", line 141, in _wait_healthy
+    raise TimeoutError(f"{url} not healthy after {timeout}s")
+TimeoutError: http://127.0.0.1:8201 not healthy after 300s
