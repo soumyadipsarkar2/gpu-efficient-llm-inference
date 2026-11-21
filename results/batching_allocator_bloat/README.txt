@@ -1,0 +1,1 @@
+Batching runs made BEFORE the MPS allocator-cache fix (engine.py: cache_slack_bytes). Reserved memory grew to >17 GB and the worker swapped; kept as evidence for the report. Superseded by results/batching/.

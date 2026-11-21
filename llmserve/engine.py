@@ -85,6 +85,12 @@ class EngineConfig:
     kv_budget_tokens: int = 65536  # admission limit on reserved KV tokens
     max_prefill_tokens: int = 4096  # cap on padded tokens prefilled per iteration
     max_queue: int = 4096
+    # The KV cache is rebuilt with a new shape every step (append, join, leave), and the MPS
+    # caching allocator keeps every freed block. Left alone, reserved memory grew to >17 GB
+    # (more than the machine's RAM) while <1 GB was live, and the worker slowed to one step
+    # per ~10 s under swapping. Return cached blocks to the driver when the gap grows too large.
+    cache_slack_bytes: int = 1 << 30
+    cache_check_every: int = 16
 
 
 class _Running:
@@ -145,6 +151,8 @@ class Engine:
         self.physical_kv_tokens = 0
         self.useful_kv_tokens = 0
         self.last_error: str | None = None
+        self.cache_releases = 0
+        self.cache_release_s = 0.0
 
     # ------------------------------------------------------------------ API
     def start(self) -> "Engine":
@@ -217,6 +225,8 @@ class Engine:
             "batch_hist": dict(self.batch_hist),
             "uptime_s": wall,
             "last_error": self.last_error,
+            "cache_releases": self.cache_releases,
+            "cache_release_s": self.cache_release_s,
         }
 
     def step_model(self) -> tuple[float | None, float | None]:
@@ -427,6 +437,18 @@ class Engine:
             run.last_tok[i] = tok
             self._emit(r, tok, t)
         self._retire_finished()
+        if self.decode_steps % self.cfg.cache_check_every == 0:
+            self._maybe_release_cache()
+
+    def _maybe_release_cache(self) -> None:
+        if self.device.type == "cpu":
+            return
+        gap = dev.memory_reserved(self.device) - dev.memory_allocated(self.device)
+        if gap > self.cfg.cache_slack_bytes:
+            t0 = time.perf_counter()
+            dev.empty_cache(self.device)
+            self.cache_release_s += time.perf_counter() - t0
+            self.cache_releases += 1
 
     def _sample(self, logits: torch.Tensor, reqs: list[GenRequest]) -> list[int]:
         greedy = logits.argmax(dim=-1)

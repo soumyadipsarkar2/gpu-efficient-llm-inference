@@ -387,3 +387,23 @@ Traceback (most recent call last):
   File "/Users/soumyadipsarkar/gpu-efficient-llm-inference/llmserve/cluster.py", line 141, in _wait_healthy
     raise TimeoutError(f"{url} not healthy after {timeout}s")
 TimeoutError: http://127.0.0.1:8201 not healthy after 300s
+[batching] continuous_b8
+  continuous_b8_c1.json: ok=24/24 thr=29 tok/s e2e_p50=1.69s p95=8.70s ttft_p50=0.17s p95=0.95s  [75s]
+  continuous_b8_c4.json: ok=24/24 thr=41 tok/s e2e_p50=4.14s p95=18.18s ttft_p50=0.11s p95=2.88s  [54s]
+  continuous_b8_c8.json: ok=32/32 thr=51 tok/s e2e_p50=8.72s p95=27.49s ttft_p50=0.43s p95=3.92s  [52s]
+  continuous_b8_c16.json: ok=64/64 thr=66 tok/s e2e_p50=21.10s p95=40.54s ttft_p50=9.91s p95=20.46s  [97s]
+  continuous_b8_c32.json: ok=128/128 thr=69 tok/s e2e_p50=43.25s p95=60.96s ttft_p50=34.34s p95=41.39s  [180s]
+[batching] continuous_b32
+  continuous_b32_c1.json: ok=24/24 thr=30 tok/s e2e_p50=1.67s p95=8.62s ttft_p50=0.16s p95=0.93s  [74s]
+  continuous_b32_c4.json: ok=24/24 thr=44 tok/s e2e_p50=3.96s p95=18.02s ttft_p50=0.11s p95=2.69s  [50s]
+  continuous_b32_c8.json: ok=32/32 thr=51 tok/s e2e_p50=8.65s p95=27.45s ttft_p50=0.43s p95=3.77s  [52s]
+  continuous_b32_c16.json: ok=64/64 thr=69 tok/s e2e_p50=15.80s p95=49.34s ttft_p50=0.82s p95=6.85s  [94s]
+  continuous_b32_c32.json: ok=128/128 thr=46 tok/s e2e_p50=48.38s p95=143.21s ttft_p50=1.46s p95=22.44s  [274s]
+  continuous_b32_c64.json: ok=256/256 thr=83 tok/s e2e_p50=59.98s p95=104.84s ttft_p50=32.94s p95=46.44s  [286s]
+[batching] continuous_b64
+python(17535) MallocStackLogging: can't turn off malloc stack logging because it was not enabled.
+  continuous_b64_c1.json: ok=24/24 thr=27 tok/s e2e_p50=1.86s p95=9.08s ttft_p50=0.18s p95=1.04s  [80s]
+  continuous_b64_c4.json: ok=24/24 thr=38 tok/s e2e_p50=4.94s p95=19.16s ttft_p50=0.15s p95=3.13s  [58s]
+  continuous_b64_c8.json: ok=32/32 thr=44 tok/s e2e_p50=11.05s p95=32.20s ttft_p50=0.46s p95=4.09s  [61s]
+  continuous_b64_c16.json: ok=64/64 thr=64 tok/s e2e_p50=17.41s p95=52.35s ttft_p50=0.83s p95=9.26s  [102s]
+[batching] serial
